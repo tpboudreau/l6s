@@ -7,14 +7,21 @@ alias stamp='date --utc "+[%FT%T]"'
 
 . /services.sh
 
-#FIXME -- run this switch only of K8S deploys:
-#export G=$(echo ${HOSTNAME} | sed 's/.*-//')
-#export N="cluster-dispatcher-${G}"
+if [ "${LIBRENMS_DISPATCHER_PLATFORM}" = "kubernetes" ]
+then
+  echo $(stamp) "[INFO] detected kubernetes platform"
+  export G=$(echo ${HOSTNAME} | sed 's/.*-//')
+  export N="cluster-dispatcher-${G}"
+  LIBRENMS_DISPATCHER_POLLER_GROUP=${G:0}
+  LIBRENMS_DISPATCHER_POLLER_NAME=${N}
+else
+  LIBRENMS_DISPATCHER_POLLER_GROUP=${LIBRENMS_DISPATCHER_POLLER_GROUP:0}
+fi
 
 echo $(stamp) "[INFO] service environment: "
 echo 
-echo "  LIBRENMS_DISPATCHER_POLLER_NAME: ${LIBRENMS_DISPATCHER_POLLER_NAME}"
 echo "  LIBRENMS_DISPATCHER_POLLER_GROUP: ${LIBRENMS_DISPATCHER_POLLER_GROUP}"
+echo "  LIBRENMS_DISPATCHER_POLLER_NAME: ${LIBRENMS_DISPATCHER_POLLER_NAME}"
 echo "  LIBRENMS_MYSQL_HOST: ${LIBRENMS_MYSQL_HOST}"
 echo "  LIBRENMS_MYSQL_PORT: ${LIBRENMS_MYSQL_PORT}"
 echo "  LIBRENMS_RRDCACHED_HOST: ${LIBRENMS_RRDCACHED_HOST}"
