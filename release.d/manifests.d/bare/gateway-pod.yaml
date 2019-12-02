@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gateway
+  labels:
+    application: librenms
+    component: gateway
+spec:
+  containers:
+    - name: service-gateway
+      image: docker.io/tpboudreau/librenms-gateway
+      securityContext:
+        capabilities:
+          add: ["NET_RAW", "NET_ADMIN"]
+      envFrom:
+        - configMapRef:
+            name: gateway
+      ports:
+        - name: mysql
+          containerPort: 3306
+          protocol: TCP
+        - name: rrdcached
+          containerPort: 42217
+          protocol: TCP
+        - name: memcached
+          containerPort: 11211
+          protocol: TCP
+        - name: redis
+          containerPort: 6379
+          protocol: TCP
+        - name: ping
+          containerPort: 8888
+          protocol: TCP

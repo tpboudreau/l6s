@@ -1,0 +1,155 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: application
+  namespace: default
+data:
+  LIBRENMS_MYSQL_DATABASE: librenms
+  LIBRENMS_ADMINISTRATIVE_ADDRESSES: 127.0.0.1,10.0.0.0/8,73.162.192.236
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway
+  namespace: default
+data:
+  HAPROXY_LOG_LEVEL: "-V -d"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: controller
+  namespace: default
+data:
+  HAPROXY_WHITELIST_ADDRESSES: 127.0.0.1,10.0.0.0/8,204.48.16.108
+  HAPROXY_GATEWAY_ADDRESSES: 10.4.0.15 
+  HAPROXY_LOG_LEVEL: "-V -d"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: controller-mysql
+  namespace: default
+data:
+  HAPROXY_FRONTEND_PORT: "33306"
+  HAPROXY_BACKEND_PROVIDER: mysql
+  HAPROXY_INACTIVITY_TIMEOUT: 480m
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: controller-rrdcached
+  namespace: default
+data:
+  HAPROXY_FRONTEND_PORT: "42217"
+  HAPROXY_BACKEND_PROVIDER: rrdcached
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: controller-memcached
+  namespace: default
+data:
+  HAPROXY_FRONTEND_PORT: "11211"
+  HAPROXY_BACKEND_PROVIDER: memcached
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: controller-redis
+  namespace: default
+data:
+  HAPROXY_FRONTEND_PORT: "36379"
+  HAPROXY_BACKEND_PROVIDER: redis
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql
+  namespace: default
+data:
+  MYSQL_INITDB_SKIP_TZINFO: "yes"
+  MYSQL_DATABASE: librenms
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rrdcached
+  namespace: default
+data:
+  RRDCACHED_CHUNK_SIZE: "2"
+  RRDCACHED_THREAD_COUNT: "2"
+  RRDCACHED_FLUSH_INTERVAL: "600"
+  RRDCACHED_WRITE_INTERVAL: "300"
+  RRDCACHED_WRITE_DELAY: "5"
+  RRDCACHED_LOG_LEVEL: LOG_DEBUG
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: memcached
+  namespace: default
+data:
+  MEMCACHED_THREAD_COUNT: "2"
+  MEMCACHED_CONNECTION_REQUESTS: "10"
+  MEMCACHED_LOG_LEVEL: -v
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis
+  namespace: default
+data:
+  REDIS_LOG_LEVEL: verbose
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: default-dispatcher
+  namespace: default
+data:
+  LIBRENMS_DISPATCHER_POLLER_NAME: default-poller
+  LIBRENMS_DISPATCHER_POLLER_GROUP: "0"
+  LIBRENMS_DISPATCHER_POLLER_WORKERS: "24"
+  LIBRENMS_DISPATCHER_DISCOVERY_WORKERS: "16"
+  LIBRENMS_DISPATCHER_SERVICES_WORKERS: "8"
+  LIBRENMS_DISPATCHER_LOG_LEVEL: -v
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: groupone-dispatcher
+  namespace: default
+data:
+  LIBRENMS_DISPATCHER_POLLER_NAME: groupone-poller
+  LIBRENMS_DISPATCHER_POLLER_GROUP: "1"
+  LIBRENMS_DISPATCHER_POLLER_WORKERS: "24"
+  LIBRENMS_DISPATCHER_DISCOVERY_WORKERS: "16"
+  LIBRENMS_DISPATCHER_SERVICES_WORKERS: "8"
+  LIBRENMS_DISPATCHER_LOG_LEVEL: -v
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grouptwo-dispatcher
+  namespace: default
+data:
+  LIBRENMS_DISPATCHER_POLLER_NAME: grouptwo-poller
+  LIBRENMS_DISPATCHER_POLLER_GROUP: "2"
+  LIBRENMS_DISPATCHER_POLLER_WORKERS: "24"
+  LIBRENMS_DISPATCHER_DISCOVERY_WORKERS: "16"
+  LIBRENMS_DISPATCHER_SERVICES_WORKERS: "8"
+  LIBRENMS_DISPATCHER_LOG_LEVEL: -v
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: groupthree-dispatcher
+  namespace: default
+data:
+  LIBRENMS_DISPATCHER_POLLER_NAME: groupthree-poller
+  LIBRENMS_DISPATCHER_POLLER_GROUP: "3"
+  LIBRENMS_DISPATCHER_POLLER_WORKERS: "24"
+  LIBRENMS_DISPATCHER_DISCOVERY_WORKERS: "16"
+  LIBRENMS_DISPATCHER_SERVICES_WORKERS: "8"
+  LIBRENMS_DISPATCHER_LOG_LEVEL: -v

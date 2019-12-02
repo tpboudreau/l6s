@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: application
+spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 73.162.192.236/32
+  - 204.48.16.108/32
+  externalTrafficPolicy: Local
+  selector:
+    component: application
+  ports:
+  - name: application
+    port: 80
+    targetPort: application
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  type: ClusterIP
+  selector:
+    component: mysql
+  ports:
+  - name: mysql
+    port: 3306
+    targetPort: mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rrdcached
+spec:
+  type: ClusterIP
+  selector:
+    component: rrdcached
+  ports:
+  - name: rrdcached
+    port: 42217
+    targetPort: rrdcached
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: memcached
+spec:
+  type: ClusterIP
+  selector:
+    component: memcached
+  ports:
+  - name: memcached
+    port: 11211
+    targetPort: memcached
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  type: ClusterIP
+  selector:
+    component: redis
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+   - 204.48.16.108/32
+  externalTrafficPolicy: Local
+  selector:
+    component: gateway
+  ports:
+  - name: mysql
+    port: 3306
+    targetPort: mysql
+  - name: rrdcached
+    port: 42217
+    targetPort: rrdcached
+  - name: memcached
+    port: 11211
+    targetPort: memcached
+  - name: redis
+    port: 6379
+    targetPort: redis
+  - name: ping
+    port: 80
+    targetPort: ping

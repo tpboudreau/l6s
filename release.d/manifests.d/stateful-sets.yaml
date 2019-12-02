@@ -1,0 +1,264 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  labels:
+    application: librenms
+spec:
+  serviceName: mysql
+  selector:
+    matchLabels:
+      component: mysql
+  replicas: 1
+  template:
+   metadata:
+     name: mysql
+     labels:
+       application: librenms
+       component: mysql
+   spec:
+     initContainers:
+     - name: mysql-volume-preparer
+       image: docker.io/tpboudreau/librenms-mysql-prepare-volume
+       envFrom:
+       - configMapRef:
+           name: mysql
+       volumeMounts:
+       - name: mysql-volume
+         subPath: configuration
+         mountPath: /etc/mysql/conf.d
+       - name: mysql-volume
+         subPath: database
+         mountPath: /var/lib/mysql
+       - name: mysql-volume
+         subPath: initialization
+         mountPath: /docker-entrypoint-initdb.d
+     containers:
+     - name: mysql-provider
+       image: docker.io/mariadb/server:10.4 
+       envFrom:
+       - configMapRef:
+           name: mysql
+       env:
+       - name: MYSQL_ROOT_PASSWORD
+         valueFrom:
+           secretKeyRef:
+             name: application
+             key: mysql_root_password
+       - name: MYSQL_USER
+         valueFrom:
+           secretKeyRef:
+             name: application
+             key: librenms_mysql_user
+       - name: MYSQL_PASSWORD
+         valueFrom:
+           secretKeyRef:
+             name: application
+             key: librenms_mysql_password
+       volumeMounts:
+       - name: mysql-volume
+         subPath: configuration
+         mountPath: /etc/mysql/conf.d
+       - name: mysql-volume
+         subPath: database
+         mountPath: /var/lib/mysql
+       - name: mysql-volume
+         subPath: initialization
+         mountPath: /docker-entrypoint-initdb.d
+       - name: mysql-socket
+         mountPath: /sock
+     - name: mysql-controller
+       image: docker.io/tpboudreau/librenms-controller
+       securityContext:
+         capabilities:
+           add: ["NET_RAW", "NET_ADMIN"]
+       envFrom:
+       - configMapRef:
+           name: controller
+       - configMapRef:
+           name: controller-mysql
+       volumeMounts:
+       - name: mysql-socket
+         mountPath: /sock
+       ports:
+       - name: mysql
+         containerPort: 33306
+         protocol: TCP
+     volumes:
+     - name: mysql-volume
+       persistentVolumeClaim:
+         claimName: mysql-volume
+     - name: mysql-socket
+       emptyDir:
+         medium: Memory
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rrdcached
+  labels:
+    application: librenms
+spec:
+  serviceName: rrdcached
+  selector:
+    matchLabels:
+      component: rrdcached
+  replicas: 1
+  template:
+    metadata:
+      name: rrdcached
+      labels:
+        application: librenms
+        component: rrdcached
+    spec:
+      containers:
+      - name: rrdcached-provider
+        image: docker.io/tpboudreau/librenms-rrdcached
+        envFrom:
+        - configMapRef:
+            name: rrdcached
+        volumeMounts:
+        - name: rrdcached-volume
+          subPath: data
+          mountPath: /rrd/data
+        - name: rrdcached-volume
+          subPath: journal
+          mountPath: /rrd/journal
+        - name: rrdcached-socket
+          mountPath: /sock
+      - name: rrdcached-controller
+        image: docker.io/tpboudreau/librenms-controller
+        securityContext:
+          capabilities:
+            add: ["NET_RAW", "NET_ADMIN"]
+        envFrom:
+        - configMapRef:
+            name: controller
+        - configMapRef:
+            name: controller-rrdcached
+        volumeMounts:
+        - name: rrdcached-socket
+          mountPath: /sock
+        ports:
+        - name: rrdcached
+          containerPort: 42217
+          protocol: TCP
+      volumes:
+      - name: rrdcached-volume
+        persistentVolumeClaim:
+          claimName: rrdcached-volume
+      - name: rrdcached-socket
+        emptyDir:
+          medium: Memory
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: memcached
+  labels:
+    application: librenms
+spec:
+  serviceName: memcached
+  selector:
+    matchLabels:
+      component: memcached
+  replicas: 1
+  template:
+    metadata:
+      name: memcached
+      labels:
+        application: librenms
+        component: memcached
+    spec:
+      containers:
+      - name: memcached-provider
+        image: docker.io/tpboudreau/librenms-memcached
+        envFrom:
+          - configMapRef:
+              name: memcached
+        volumeMounts:
+        - name: memcached-socket
+          mountPath: /sock
+      - name: memcached-controller
+        image: docker.io/tpboudreau/librenms-controller
+        securityContext:
+          capabilities:
+            add: ["NET_RAW", "NET_ADMIN"]
+        envFrom:
+        - configMapRef:
+            name: controller
+        - configMapRef:
+            name: controller-memcached
+        volumeMounts:
+        - name: memcached-socket
+          mountPath: /sock
+        ports:
+        - name: memcached
+          containerPort: 11211
+          protocol: TCP
+      volumes:
+      - name: memcached-socket
+        emptyDir:
+          medium: Memory
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  labels:
+    application: librenms
+spec:
+  serviceName: redis
+  selector:
+    matchLabels:
+      component: redis
+  replicas: 1
+  template:
+    metadata:
+      name: redis
+      labels:
+        application: librenms
+        component: redis
+    spec:
+      containers:
+      - name: redis-provider
+        image: docker.io/tpboudreau/librenms-redis
+        envFrom:
+        - configMapRef:
+            name: redis
+        env:
+        - name: REDIS_REQUIRED_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+        volumeMounts:
+        - name: redis-volume
+          subPath: data
+          mountPath: /data
+        - name: redis-socket
+          mountPath: /sock
+      - name: redis-controller
+        image: docker.io/tpboudreau/librenms-controller
+        securityContext:
+          capabilities:
+            add: ["NET_RAW", "NET_ADMIN"]
+        envFrom:
+        - configMapRef:
+            name: controller
+        - configMapRef:
+            name: controller-redis
+        volumeMounts:
+        - name: redis-socket
+          mountPath: /sock
+        ports:
+        - name: redis
+          containerPort: 36379
+          protocol: TCP
+      volumes:
+      - name: redis-volume
+        persistentVolumeClaim:
+          claimName: redis-volume
+      - name: redis-socket
+        emptyDir:
+          medium: Memory

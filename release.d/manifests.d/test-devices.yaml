@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-device-zero
+spec:
+  clusterIP: None
+  selector:
+    component: test-device-zero
+  ports:
+  - port: 161
+    targetPort: 161
+    protocol: UDP
+    name: snmp-udp
+  - port: 161
+    targetPort: 161
+    protocol: TCP
+    name: snmp-tcp
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-device-zero
+  labels:
+    application: librenms
+    component: test-device-zero
+spec:
+  containers:
+  - name: device
+    image: docker.io/tpboudreau/librenms-device
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-device-one
+spec:
+  clusterIP: None
+  selector:
+    component: test-device-one
+  ports:
+  - port: 161
+    targetPort: 161
+    protocol: UDP
+    name: snmp-udp
+  - port: 161
+    targetPort: 161
+    protocol: TCP
+    name: snmp-tcp
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-device-one
+  labels:
+    application: librenms
+    component: test-device-one
+spec:
+  containers:
+  - name: device
+    image: docker.io/tpboudreau/librenms-device
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-device-two
+spec:
+  clusterIP: None
+  selector:
+    component: test-device-two
+  ports:
+  - port: 161
+    targetPort: 161
+    protocol: UDP
+    name: snmp-udp
+  - port: 161
+    targetPort: 161
+    protocol: TCP
+    name: snmp-tcp
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-device-two
+  labels:
+    application: librenms
+    component: test-device-two
+spec:
+  containers:
+  - name: device
+    image: docker.io/tpboudreau/librenms-device
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-device-three
+spec:
+  clusterIP: None
+  selector:
+    component: test-device-three
+  ports:
+  - port: 161
+    targetPort: 161
+    protocol: UDP
+    name: snmp-udp
+  - port: 161
+    targetPort: 161
+    protocol: TCP
+    name: snmp-tcp
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-device-three
+  labels:
+    application: librenms
+    component: test-device-three
+spec:
+  containers:
+  - name: device
+    image: docker.io/tpboudreau/librenms-device

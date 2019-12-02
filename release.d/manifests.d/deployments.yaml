@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: application
+  labels:
+    application: librenms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: application
+  template:
+    metadata:
+      name: application
+      labels:
+        application: librenms
+        component: application
+    spec:
+      initContainers:
+      - name: application-volume-preparer
+        image: docker.io/tpboudreau/librenms-application-prepare-volume
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+        - name: LIBRENMS_APPLICATION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_application_key
+        volumeMounts:
+        - name: application-volume
+          mountPath: /opt/librenms
+      - name: mysql-checker
+        image: docker.io/tpboudreau/librenms-check-mysql
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+      - name: rrdcached-checker
+        image: docker.io/tpboudreau/librenms-check-rrdcached
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: memcached-checker
+        image: docker.io/tpboudreau/librenms-check-memcached
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: redis-checker
+        image: docker.io/tpboudreau/librenms-check-redis
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+      containers:
+      - name: application-php-fpm
+        image: docker.io/tpboudreau/librenms-application-php-fpm
+        envFrom:
+        - configMapRef:
+            name: application
+        volumeMounts:
+        - name: application-volume
+          mountPath: /opt/librenms
+        - name: application-socket
+          mountPath: /sock
+      - name: application-nginx
+        image: docker.io/tpboudreau/librenms-application-nginx
+        envFrom:
+        - configMapRef:
+            name: application
+        volumeMounts:
+        - name: application-volume
+          mountPath: /opt/librenms
+        - name: application-socket
+          mountPath: /sock
+        ports:
+        - name: application
+          containerPort: 8000
+          protocol: TCP
+      volumes:
+      - name: application-volume
+        emptyDir: {}
+      - name: application-socket
+        emptyDir:
+          medium: Memory

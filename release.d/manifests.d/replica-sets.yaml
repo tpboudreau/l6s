@@ -1,0 +1,343 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: default-dispatcher
+  labels:
+    application: librenms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: default-dispatcher
+  template:
+    metadata:
+      name: default-dispatcher
+      labels:
+        application: librenms
+        component: default-dispatcher
+    spec:
+      initContainers:
+      - name: mysql-checker
+        image: docker.io/tpboudreau/librenms-check-mysql
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+      - name: rrdcached-checker
+        image: docker.io/tpboudreau/librenms-check-rrdcached
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: memcached-checker
+        image: docker.io/tpboudreau/librenms-check-memcached
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: redis-checker
+        image: docker.io/tpboudreau/librenms-check-redis
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+      containers:
+      - name: dispatcher
+        image: docker.io/tpboudreau/librenms-dispatcher
+        envFrom:
+        - configMapRef:
+            name: application
+        - configMapRef:
+            name: default-dispatcher
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+        - name: LIBRENMS_APPLICATION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_application_key
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: groupone-dispatcher
+  labels:
+    application: librenms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: groupone-dispatcher
+  template:
+    metadata:
+      name: groupone-dispatcher
+      labels:
+        application: librenms
+        component: groupone-dispatcher
+    spec:
+      initContainers:
+      - name: mysql-checker
+        image: docker.io/tpboudreau/librenms-check-mysql
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+      - name: rrdcached-checker
+        image: docker.io/tpboudreau/librenms-check-rrdcached
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: memcached-checker
+        image: docker.io/tpboudreau/librenms-check-memcached
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: redis-checker
+        image: docker.io/tpboudreau/librenms-check-redis
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+      containers:
+      - name: dispatcher
+        image: docker.io/tpboudreau/librenms-dispatcher
+        envFrom:
+        - configMapRef:
+            name: application
+        - configMapRef:
+            name: groupone-dispatcher
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+        - name: LIBRENMS_APPLICATION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_application_key
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: grouptwo-dispatcher
+  labels:
+    application: librenms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: grouptwo-dispatcher
+  template:
+    metadata:
+      name: grouptwo-dispatcher
+      labels:
+        application: librenms
+        component: grouptwo-dispatcher
+    spec:
+      initContainers:
+      - name: mysql-checker
+        image: docker.io/tpboudreau/librenms-check-mysql
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+      - name: rrdcached-checker
+        image: docker.io/tpboudreau/librenms-check-rrdcached
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: memcached-checker
+        image: docker.io/tpboudreau/librenms-check-memcached
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: redis-checker
+        image: docker.io/tpboudreau/librenms-check-redis
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+      containers:
+      - name: dispatcher
+        image: docker.io/tpboudreau/librenms-dispatcher
+        envFrom:
+        - configMapRef:
+            name: application
+        - configMapRef:
+            name: grouptwo-dispatcher
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+        - name: LIBRENMS_APPLICATION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_application_key
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: groupthree-dispatcher
+  labels:
+    application: librenms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: groupthree-dispatcher
+  template:
+    metadata:
+      name: groupthree-dispatcher
+      labels:
+        application: librenms
+        component: groupthree-dispatcher
+    spec:
+      initContainers:
+      - name: mysql-checker
+        image: docker.io/tpboudreau/librenms-check-mysql
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+      - name: rrdcached-checker
+        image: docker.io/tpboudreau/librenms-check-rrdcached
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: memcached-checker
+        image: docker.io/tpboudreau/librenms-check-memcached
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: redis-checker
+        image: docker.io/tpboudreau/librenms-check-redis
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+      containers:
+      - name: dispatcher
+        image: docker.io/tpboudreau/librenms-dispatcher
+        envFrom:
+        - configMapRef:
+            name: application
+        - configMapRef:
+            name: groupthree-dispatcher
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+        - name: LIBRENMS_APPLICATION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_application_key

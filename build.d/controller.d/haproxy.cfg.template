@@ -1,0 +1,23 @@
+
+global
+  maxconn 4096
+
+defaults
+  timeout connect 30s
+  timeout client ${HAPROXY_INACTIVITY_TIMEOUT}
+  timeout server ${HAPROXY_INACTIVITY_TIMEOUT}
+  mode tcp
+  option tcp-smart-accept
+  option tcp-smart-connect
+  retries 5
+
+frontend controller
+  bind :${HAPROXY_FRONTEND_PORT}
+  tcp-request connection reject if { ${HAPROXY_REJECT_ALL} } || { src -n -f /haproxy/blacklist_addresses }
+  tcp-request connection expect-proxy layer4 if { src -n -f /haproxy/gateway_addresses }
+  tcp-request content accept if { ${HAPROXY_ACCEPT_ALL} } || { src -n -f /haproxy/acceptable_addresses }
+  use_backend provider
+
+backend provider
+  server ${HAPROXY_BACKEND_PROVIDER} unix@/sock/${HAPROXY_BACKEND_PROVIDER}.sock
+
