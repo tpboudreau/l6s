@@ -13,9 +13,12 @@ defaults
 
 frontend controller
   bind :${HAPROXY_FRONTEND_PORT}
-  tcp-request connection reject if { ${HAPROXY_REJECT_ALL} } || { src -n -f /haproxy/blacklist_addresses }
-  tcp-request connection expect-proxy layer4 if { src -n -f /haproxy/gateway_addresses }
-  tcp-request content accept if { ${HAPROXY_ACCEPT_ALL} } || { src -n -f /haproxy/acceptable_addresses }
+  tcp-request connection reject unless { src -n -f /haproxy/whitelist_addresses } || { ${HAPROXY_ACCEPT_ALL} }
+  use_backend provider
+
+frontend proxy-controller
+  bind :${HAPROXY_PROXY_PORT} accept-proxy
+  tcp-request content reject unless { src -n -f /haproxy/whitelist_addresses } || { ${HAPROXY_ACCEPT_ALL} }
   use_backend provider
 
 backend provider

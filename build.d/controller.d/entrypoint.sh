@@ -14,6 +14,12 @@ then
   exit 1
 fi
 
+if [ ${HAPROXY_PROXY_PORT:-"proxy_port_not_set"} = "proxy_port_not_set" ]
+then
+  echo $(stamp) "[ERROR] environment variable HAPROXY_PROXY_PORT must be provided"
+  exit 1
+fi
+
 if [ ${HAPROXY_BACKEND_PROVIDER:-"backend_provider_not_set"} = "backend_provider_not_set" ]
 then
   echo $(stamp) "[ERROR] environment variable HAPROXY_BACKEND_PROVIDER must be provided"
@@ -37,14 +43,7 @@ separate()
         echo '127.0.0.0/8' >> ${F}
         ;;
       '0.0.0.0/0')
-        if [ ${2} = 'blacklist' ]
-	then
-          echo 'always_true' > ${LOCATION}/reject_all
-        fi
-        if [ ${2} = 'whitelist' ]
-	then
-          echo 'always_true' > ${LOCATION}/accept_all
-        fi
+        echo 'always_true' > ${LOCATION}/accept_all
         ;;
       *)
         echo ${a} >> ${F}
@@ -54,26 +53,18 @@ separate()
   esac
 }
 
-echo 'always_false' > ${LOCATION}/reject_all
 echo 'always_false' > ${LOCATION}/accept_all
-separate "${HAPROXY_BLACKLIST_ADDRESSES}" "blacklist"
-separate "${HAPROXY_GATEWAY_ADDRESSES}" "gateway"
 separate "${HAPROXY_WHITELIST_ADDRESSES}" "whitelist"
-cat ${LOCATION}/whitelist_addresses ${LOCATION}/gateway_addresses > ${LOCATION}/acceptable_addresses
-
-export HAPROXY_REJECT_ALL=$(cat ${LOCATION}/reject_all)
 export HAPROXY_ACCEPT_ALL=$(cat ${LOCATION}/accept_all)
 
 echo $(stamp) "[INFO] process environment: "
 echo 
 echo "  HAPROXY_BACKEND_PROVIDER: ${HAPROXY_BACKEND_PROVIDER}"
 echo "  HAPROXY_FRONTEND_PORT: ${HAPROXY_FRONTEND_PORT}"
+echo "  HAPROXY_PROXY_PORT: ${HAPROXY_PROXY_PORT}"
 echo "  HAPROXY_INACTIVITY_TIMEOUT: ${HAPROXY_INACTIVITY_TIMEOUT}"
-echo "  gateway addresses: $(cat ${LOCATION}/gateway_addresses | tr '\n' ' ')"
-echo "  HAPROXY_REJECT_ALL: ${HAPROXY_REJECT_ALL}"
-echo "  rejectable addresses: $(cat ${LOCATION}/blacklist_addresses | tr '\n' ' ')"
 echo "  HAPROXY_ACCEPT_ALL: ${HAPROXY_ACCEPT_ALL}"
-echo "  acceptable addresses: $(cat ${LOCATION}/acceptable_addresses | tr '\n' ' ')"
+echo "  acceptable addresses: $(cat ${LOCATION}/whitelist_addresses | tr '\n' ' ')"
 echo "  HAPROXY_LOG_LEVEL: ${HAPROXY_LOG_LEVEL}"
 echo 
 

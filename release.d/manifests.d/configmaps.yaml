@@ -22,7 +22,6 @@ metadata:
   namespace: default
 data:
   HAPROXY_WHITELIST_ADDRESSES: 127.0.0.1,10.0.0.0/8,204.48.16.108
-  HAPROXY_GATEWAY_ADDRESSES: 10.4.0.15 
   HAPROXY_LOG_LEVEL: "-V -d"
 ---
 apiVersion: v1
@@ -32,6 +31,7 @@ metadata:
   namespace: default
 data:
   HAPROXY_FRONTEND_PORT: "33306"
+  HAPROXY_PROXY_PORT: "33307"
   HAPROXY_BACKEND_PROVIDER: mysql
   HAPROXY_INACTIVITY_TIMEOUT: 480m
 ---
@@ -42,6 +42,7 @@ metadata:
   namespace: default
 data:
   HAPROXY_FRONTEND_PORT: "42217"
+  HAPROXY_PROXY_PORT: "42218"
   HAPROXY_BACKEND_PROVIDER: rrdcached
 ---
 apiVersion: v1
@@ -51,6 +52,7 @@ metadata:
   namespace: default
 data:
   HAPROXY_FRONTEND_PORT: "11211"
+  HAPROXY_PROXY_PORT: "11212"
   HAPROXY_BACKEND_PROVIDER: memcached
 ---
 apiVersion: v1
@@ -60,6 +62,7 @@ metadata:
   namespace: default
 data:
   HAPROXY_FRONTEND_PORT: "36379"
+  HAPROXY_PROXY_PORT: "36380"
   HAPROXY_BACKEND_PROVIDER: redis
 ---
 apiVersion: v1

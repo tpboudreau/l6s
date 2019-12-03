@@ -27,6 +27,9 @@ spec:
   - name: mysql
     port: 3306
     targetPort: mysql
+  - name: mysql-proxy
+    port: 3307
+    targetPort: mysql-proxy
 ---
 apiVersion: v1
 kind: Service
@@ -40,6 +43,9 @@ spec:
   - name: rrdcached
     port: 42217
     targetPort: rrdcached
+  - name: rrdcached-proxy
+    port: 42218
+    targetPort: rrdcached-proxy
 ---
 apiVersion: v1
 kind: Service
@@ -53,6 +59,9 @@ spec:
   - name: memcached
     port: 11211
     targetPort: memcached
+  - name: memcached-proxy
+    port: 11212
+    targetPort: memcached-proxy
 ---
 apiVersion: v1
 kind: Service
@@ -66,6 +75,9 @@ spec:
   - name: redis
     port: 6379
     targetPort: redis
+  - name: redis-proxy
+    port: 6380
+    targetPort: redis-proxy
 ---
 apiVersion: v1
 kind: Service
@@ -92,5 +104,5 @@ spec:
     port: 6379
     targetPort: redis
   - name: ping
-    port: 80
+    port: 8888
     targetPort: ping

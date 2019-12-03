@@ -18,10 +18,8 @@ RUN apk add --no-cache gettext libcap && \
 
 COPY haproxy.cfg.template whitelist_addresses.default entrypoint.sh /haproxy/
 RUN ln -s /haproxy/whitelist_addresses.default /haproxy/whitelist_addresses && \
-    touch /haproxy/blacklist_addresses && \
-    touch /haproxy/gateway_addresses && \
     chown -R haproxy:haproxy /haproxy && \
-    chmod 644 /haproxy/haproxy.* /haproxy/*addresses* && \
+    chmod 644 /haproxy/haproxy.* /haproxy/whitelist_addresses && \
     chmod 755 /haproxy/entrypoint.sh
 
 VOLUME /sock

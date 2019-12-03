@@ -84,6 +84,9 @@ spec:
        - name: mysql
          containerPort: 33306
          protocol: TCP
+       - name: mysql-proxy
+         containerPort: 33307
+         protocol: TCP
      volumes:
      - name: mysql-volume
        persistentVolumeClaim:
@@ -143,6 +146,9 @@ spec:
         - name: rrdcached
           containerPort: 42217
           protocol: TCP
+        - name: rrdcached-proxy
+          containerPort: 42218
+          protocol: TCP
       volumes:
       - name: rrdcached-volume
         persistentVolumeClaim:
@@ -195,6 +201,9 @@ spec:
         ports:
         - name: memcached
           containerPort: 11211
+          protocol: TCP
+        - name: memcached-proxy
+          containerPort: 11212
           protocol: TCP
       volumes:
       - name: memcached-socket
@@ -254,6 +263,9 @@ spec:
         ports:
         - name: redis
           containerPort: 36379
+          protocol: TCP
+        - name: redis-proxy
+          containerPort: 36380
           protocol: TCP
       volumes:
       - name: redis-volume
