@@ -5,16 +5,12 @@ USER root
 
 RUN addgroup -S -g 1010 memcached && \
     adduser -S -u 1010 -G memcached -g memcached memcached && \
-    mkdir -p /sock && \
-    chmod 777 /sock && \
     chmod 777 /run
 
 COPY ./entrypoint.sh /
 
 RUN chown memcached:memcached /entrypoint.sh && \
     chmod 755 /entrypoint.sh 
-
-VOLUME /sock
 
 USER memcached
 

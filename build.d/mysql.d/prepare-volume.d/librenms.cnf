@@ -2,8 +2,8 @@
 [mysqld]
 innodb_file_per_table=1
 lower_case_table_names=0
-socket=/sock/mysql.sock
-skip_networking=on
+#socket=/sock/mysql.sock
+#skip_networking=on
 skip_name_resolve=1
 
 #net_read_timeout=300
