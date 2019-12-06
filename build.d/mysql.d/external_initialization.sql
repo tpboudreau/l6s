@@ -1,0 +1,8 @@
+
+CREATE DATABASE librenms;
+ALTER DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+CREATE USER 'librenms'@'%' IDENTIFIED BY 'L1br3NM5';
+GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'%';
+FLUSH PRIVILEGES;
+

@@ -21,11 +21,12 @@ RUN apk update && \
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY fastcgi.conf /etc/nginx/fastcgi.conf
 COPY librenms.conf /etc/nginx/conf.d/librenms.conf
-COPY whitelist.conf.default /nginx/whitelist.conf
+COPY whitelist.conf.default /nginx/whitelist.conf.default
 COPY entrypoint.sh /entrypoint.sh
 
-RUN chown nginx:nginx /nginx/whitelist.conf /entrypoint.sh && \
-    chmod 644 /nginx/whitelist.conf && \
+RUN ln -s /nginx/whitelist.conf.default /nginx/whitelist.conf && \
+    chown nginx:nginx /nginx/whitelist.conf /entrypoint.sh && \
+    chmod 644 /nginx/whitelist.conf.default && \
     chmod 755 /entrypoint.sh
 
 VOLUME /opt/librenms /sock

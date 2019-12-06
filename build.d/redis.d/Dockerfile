@@ -1,9 +1,7 @@
 
 FROM redis:5.0-alpine
 
-RUN addgroup -S -g 1010 redisd && \
-    adduser -S -u 1010 -G redisd -g redisd redisd && \
-    chmod 777 /data && \
+RUN chmod 777 /data && \
     chmod 777 /run
 
 COPY redis.conf /usr/local/etc/redis/redis.conf
@@ -16,7 +14,9 @@ RUN chown redis:redis /usr/local/etc/redis/redis.conf && \
 
 VOLUME /data
 
-USER redisd
+USER redis
+
+EXPOSE 36379
 
 ENV REDIS_LOG_LEVEL=notice
 

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rrdcached
+spec:
+  type: ClusterIP
+  selector: {}
+  ports:
+  - name: rrdcached
+    protocol: TCP
+    port: 42217
+    targetPort: 42217
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: rrdcached
+subsets:
+- addresses:
+  - ip: 34.83.217.126
+  ports:
+  - name: rrdcached
+    port: 42217 

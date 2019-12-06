@@ -32,6 +32,9 @@ COPY common.d/timezone.ini /etc/php/7.2/fpm/conf.d
 RUN ln -s /etc/php/7.2/mods-available/memcached.ini /etc/php/7.2/cli/conf.d/memcached.ini && \
     ln -s /etc/php/7.2/mods-available/memcached.ini /etc/php/7.2/fpm/conf.d/memcached.ini
 
+RUN rm /etc/systemd/system/multi-user.target.wants/*.service && \
+    rm /etc/systemd/system/timers.target.wants/*.timer
+
 #==============================================================================
 
 FROM base as build
@@ -52,6 +55,32 @@ RUN wget -nv -O /tmp/librenms.tar.gz https://github.com/librenms/librenms/archiv
 RUN su -c '/opt/librenms/scripts/composer_wrapper.php install --no-dev' - librenms
 
 RUN tar czvf /tmp/librenms.tar.gz --acls /opt/librenms
+
+#==============================================================================
+
+FROM build as dispatcher
+
+WORKDIR /opt/librenms
+
+RUN apt-get install -y gettext-base python3-pip && \
+    pip3 install -r requirements.txt
+
+COPY common.d/librenms.env common.d/librenms.config.php common.d/librenms.dispatcher.config.php /tmp/
+RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
+
+COPY dispatcher.d/entrypoint.sh /entrypoint.sh
+COPY common.d/services.sh /services.sh
+
+ENV LIBRENMS_DISPATCHER_POLLER_NAME=poller \
+    LIBRENMS_DISPATCHER_POLLER_GROUP=0 \
+    LIBRENMS_DISPATCHER_POLLER_WORKERS=24 \
+    LIBRENMS_DISPATCHER_DISCOVERY_WORKERS=16 \
+    LIBRENMS_DISPATCHER_SERVICES_WORKERS=8 \
+    LIBRENMS_DISPATCHER_LOG_LEVEL=
+
+USER librenms
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 #==============================================================================
 
@@ -171,32 +200,6 @@ VOLUME /opt/librenms
 WORKDIR /opt/librenms
 
 ENTRYPOINT ["php", "validate.php", "-g", "configuration,database,dependencies,php,programs,rrdcheck,user"]
-
-#==============================================================================
-
-FROM build as dispatcher
-
-WORKDIR /opt/librenms
-
-RUN apt-get install -y gettext-base python3-pip && \
-    pip3 install -r requirements.txt
-
-COPY common.d/librenms.env common.d/librenms.config.php common.d/librenms.dispatcher.config.php /tmp/
-RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
-
-COPY dispatcher.d/entrypoint.sh /entrypoint.sh
-COPY common.d/services.sh /services.sh
-
-ENV LIBRENMS_DISPATCHER_POLLER_NAME=poller \
-    LIBRENMS_DISPATCHER_POLLER_GROUP=0 \
-    LIBRENMS_DISPATCHER_POLLER_WORKERS=24 \
-    LIBRENMS_DISPATCHER_DISCOVERY_WORKERS=16 \
-    LIBRENMS_DISPATCHER_SERVICES_WORKERS=8 \
-    LIBRENMS_DISPATCHER_LOG_LEVEL=
-
-USER librenms
-
-ENTRYPOINT ["/entrypoint.sh"]
 
 #==============================================================================
 

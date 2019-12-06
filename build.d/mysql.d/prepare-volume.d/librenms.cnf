@@ -2,13 +2,9 @@
 [mysqld]
 innodb_file_per_table=1
 lower_case_table_names=0
-#socket=/sock/mysql.sock
-#skip_networking=on
 skip_name_resolve=1
+port=33306
 
-#net_read_timeout=300
-#net_retry_count=100
-#net_write_timeout=600
 max_allowed_packet=64M
 max_connections=4096
 connect_timeout=30

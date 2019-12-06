@@ -10,64 +10,6 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gateway
-  namespace: default
-data:
-  HAPROXY_LOG_LEVEL: "-V -d"
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: controller
-  namespace: default
-data:
-  HAPROXY_WHITELIST_ADDRESSES: 127.0.0.1,10.0.0.0/8,204.48.16.108
-  HAPROXY_LOG_LEVEL: "-V -d"
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: controller-mysql
-  namespace: default
-data:
-  HAPROXY_FRONTEND_PORT: "33306"
-  HAPROXY_PROXY_PORT: "33307"
-  HAPROXY_BACKEND_PROVIDER: mysql
-  HAPROXY_INACTIVITY_TIMEOUT: 480m
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: controller-rrdcached
-  namespace: default
-data:
-  HAPROXY_FRONTEND_PORT: "42217"
-  HAPROXY_PROXY_PORT: "42218"
-  HAPROXY_BACKEND_PROVIDER: rrdcached
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: controller-memcached
-  namespace: default
-data:
-  HAPROXY_FRONTEND_PORT: "11211"
-  HAPROXY_PROXY_PORT: "11212"
-  HAPROXY_BACKEND_PROVIDER: memcached
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: controller-redis
-  namespace: default
-data:
-  HAPROXY_FRONTEND_PORT: "36379"
-  HAPROXY_PROXY_PORT: "36380"
-  HAPROXY_BACKEND_PROVIDER: redis
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
   name: mysql
   namespace: default
 data:
@@ -108,11 +50,11 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: default-dispatcher
+  name: dispatcher
   namespace: default
 data:
   LIBRENMS_DISPATCHER_PLATFORM: kubernetes
-  LIBRENMS_DISPATCHER_POLLER_NAME: default-poller
+  LIBRENMS_DISPATCHER_POLLER_NAME: poller
   LIBRENMS_DISPATCHER_POLLER_GROUP: "0"
   LIBRENMS_DISPATCHER_POLLER_WORKERS: "24"
   LIBRENMS_DISPATCHER_DISCOVERY_WORKERS: "16"

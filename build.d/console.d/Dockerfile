@@ -5,17 +5,10 @@ RUN apk update && \
     apk upgrade && \
     apk add --no-cache bind-tools curl libmemcached mariadb-client redis rrdtool wget
 
-COPY commands /
+COPY commands environment.sh /
 
-RUN chmod 644 /commands
-
-ENV MYSQL_HOST=n.n.n.n \
-    MYSQL_PORT=p \
-    RRDCACHED_ADDRESS=n.n.n.n:p \
-    MEMCACHED_SERVERS=n.n.n.n:p \
-    REDIS_HOST=n.n.n.n \
-    REDIS_PORT=p \
-    REDISCLI_AUTH=x
+RUN chmod 644 /commands && \
+    chmod 755 /environment.sh
 
 ENTRYPOINT sleep 3600
 

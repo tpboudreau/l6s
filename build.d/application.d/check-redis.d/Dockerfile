@@ -11,10 +11,6 @@ COPY entrypoint.sh services.sh /
 
 RUN chmod 755 /entrypoint.sh /services.sh
 
-ENV LIBRENMS_REDIS_HOST=n.n.n.n \
-    LIBRENMS_REDIS_PORT=p \
-    LIBRENMS_REDIS_PASSWORD=x
-
 USER librenms
 
 ENTRYPOINT ["./entrypoint.sh"]

@@ -11,9 +11,6 @@ COPY entrypoint.sh services.sh /
 
 RUN chmod 755 /entrypoint.sh /services.sh
 
-ENV LIBRENMS_RRDCACHED_HOST=n.n.n.n \
-    LIBRENMS_RRDCACHED_PORT=p
-
 USER librenms
 
 ENTRYPOINT ["./entrypoint.sh"]

@@ -1,8 +1,8 @@
 
 Test commands
 -------------
-mysql -h $MYSQL_HOST -u librenms -p (on tester)
-mysql -S /sock/mysql.sock -u librenms -p librenms (on provider)
+mysql -h $MYSQL_HOST -P $MYSQL_PORT -u librenms -p (on tester)
+mysql -S /sock/mysql.sock -u librenms -p librenms (on provider, if domain socket is listening)
 rrdtool list / (provided RRDCACHED_ADDRESS is set)
 memstat --verbose (provided MEMCACHED_SERVERS is set)
 redis-cli -h $REDIS_HOST -p $REDIS_PORT -r 4 -i 1 ping (provided REDISCLI_AUTH is set)

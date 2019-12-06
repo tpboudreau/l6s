@@ -1,3 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: application
+spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 73.162.192.236/32
+  - 204.48.16.108/32
+  externalTrafficPolicy: Local
+  selector:
+    component: application
+  ports:
+  - name: application
+    port: 80
+    targetPort: application
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,8 +34,8 @@ spec:
         component: application
     spec:
       initContainers:
-      - name: application-volume-preparer
-        image: docker.io/tpboudreau/librenms-application-prepare-volume
+      - name: application-prepare-volume
+        image: docker.io/tpboudreau/librenms-application-prepare-volume:0.1
         envFrom:
         - configMapRef:
             name: application
@@ -46,8 +63,8 @@ spec:
         volumeMounts:
         - name: application-volume
           mountPath: /opt/librenms
-      - name: mysql-checker
-        image: docker.io/tpboudreau/librenms-check-mysql
+      - name: check-mysql
+        image: docker.io/tpboudreau/librenms-check-mysql:0.1
         envFrom:
         - configMapRef:
             name: application
@@ -62,18 +79,18 @@ spec:
             secretKeyRef:
               name: application
               key: librenms_mysql_password
-      - name: rrdcached-checker
-        image: docker.io/tpboudreau/librenms-check-rrdcached
+      - name: check-rrdcached
+        image: docker.io/tpboudreau/librenms-check-rrdcached:0.1
         envFrom:
         - configMapRef:
             name: application
-      - name: memcached-checker
-        image: docker.io/tpboudreau/librenms-check-memcached
+      - name: check-memcached
+        image: docker.io/tpboudreau/librenms-check-memcached:0.1
         envFrom:
         - configMapRef:
             name: application
-      - name: redis-checker
-        image: docker.io/tpboudreau/librenms-check-redis
+      - name: check-redis
+        image: docker.io/tpboudreau/librenms-check-redis:0.1
         envFrom:
         - configMapRef:
             name: application
@@ -85,7 +102,7 @@ spec:
               key: librenms_redis_password
       containers:
       - name: application-php-fpm
-        image: docker.io/tpboudreau/librenms-application-php-fpm
+        image: docker.io/tpboudreau/librenms-application-php-fpm:0.1
         envFrom:
         - configMapRef:
             name: application
@@ -95,7 +112,7 @@ spec:
         - name: application-socket
           mountPath: /sock
       - name: application-nginx
-        image: docker.io/tpboudreau/librenms-application-nginx
+        image: docker.io/tpboudreau/librenms-application-nginx:0.1
         envFrom:
         - configMapRef:
             name: application

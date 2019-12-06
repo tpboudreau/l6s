@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rrdcached
+spec:
+  type: ClusterIP
+  selector:
+    component: rrdcached
+  ports:
+  - name: rrdcached
+    port: 42217
+    targetPort: rrdcached
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rrdcached
+  labels:
+    application: librenms
+spec:
+  serviceName: rrdcached
+  selector:
+    matchLabels:
+      component: rrdcached
+  replicas: 1
+  template:
+    metadata:
+      name: rrdcached
+      labels:
+        application: librenms
+        component: rrdcached
+    spec:
+      containers:
+      - name: rrdcached
+        image: docker.io/tpboudreau/librenms-rrdcached:0.1
+        envFrom:
+        - configMapRef:
+            name: rrdcached
+        volumeMounts:
+        - name: rrdcached-volume
+          subPath: data
+          mountPath: /data
+        - name: rrdcached-volume
+          subPath: journal
+          mountPath: /journal
+        ports:
+        - name: rrdcached
+          containerPort: 42217
+          protocol: TCP
+      volumes:
+      - name: rrdcached-volume
+        persistentVolumeClaim:
+          claimName: rrdcached-volume

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker build -t tpboudreau/librenms-check-redis .
+docker build -t tpboudreau/librenms-check-redis:0.1 .
 

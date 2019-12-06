@@ -1,0 +1,56 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: prepare-mysql
+spec:
+  template:
+    metadata:
+      name: prepare-mysql
+      labels:
+        application: librenms
+        component: install
+    spec:
+      containers:
+      - name: prepare-mysql
+        image: docker.io/tpboudreau/librenms-prepare-mysql:0.1
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+        - name: LIBRENMS_ADMINISTRATIVE_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_administrative_user
+        - name: LIBRENMS_ADMINISTRATIVE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_administrative_password
+        - name: LIBRENMS_ADMINISTRATIVE_EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_administrative_email
+        - name: LIBRENMS_APPLICATION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_application_key
+      restartPolicy: Never
+  backoffLimit: 3
