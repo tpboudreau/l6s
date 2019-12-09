@@ -20,6 +20,11 @@ $config['memcached']['enable'] = true;
 $config['memcached']['host'] = '${LIBRENMS_MEMCACHED_HOST}';
 $config['memcached']['port'] = '${LIBRENMS_MEMCACHED_PORT}';
 
+$config['use_snmp_ping'] = true;
+$config['record_snmp_ping_rtt'] = true;
+$config['snmp_ping_retries'] = 2;
+$config['snmp_ping_timeout'] = 5;
+
 $config['rrdtool'] = '/usr/bin/rrdtool';
 $config['fping'] = '/usr/bin/fping';
 $config['fping6'] = '/usr/bin/fping6';
@@ -29,6 +34,7 @@ $config['snmpwalk'] = '/usr/bin/snmpwalk';
 $config['snmpbulkwalk'] = '/usr/bin/snmpbulkwalk';
 $config['snmpget'] = '/usr/bin/snmpget';
 $config['snmpgetnext'] = '/usr/bin/snmpgetnext';
+$config['snmpstatus'] = '/usr/bin/snmpstatus';
 $config['whois'] = '/usr/bin/whois';
 $config['ping'] = '/bin/ping';
 $config['mtr'] = '/usr/bin/mtr';

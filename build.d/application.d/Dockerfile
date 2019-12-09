@@ -10,7 +10,7 @@ RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository universe && \
     DEBIAN_FRONTEND=noninteractive apt-get install tzdata && \
-    apt-get install -y acl composer curl fping graphviz imagemagick mariadb-client memcached mtr-tiny nmap python-memcache python-mysqldb rrdtool snmp unzip whois && \
+    apt-get install -y acl composer curl graphviz imagemagick mariadb-client memcached mtr-tiny nmap python-memcache python-mysqldb rrdtool snmp unzip whois && \
     apt-get install -y pkg-config php7.2-dev zlib1g-dev libmemcached-dev && \
     apt-get install -y php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-mysqlnd php7.2-snmp php7.2-xml php7.2-zip
 
@@ -46,7 +46,7 @@ RUN apt-get install -y wget && \
 
 WORKDIR /opt/librenms
 
-RUN wget -nv -O /tmp/librenms.tar.gz https://github.com/librenms/librenms/archive/master.tar.gz && \
+RUN wget -nv -O /tmp/librenms.tar.gz https://github.com/tpboudreau/librenms/tarball/use_snmp_ping && \
     tar xzf /tmp/librenms.tar.gz --strip-components=1 && \
     chown -R librenms:librenms /opt/librenms && \
     setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/ && \

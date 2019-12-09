@@ -67,10 +67,12 @@ def valid_librenms_instance():
     ok = False
     try:
         MYSQL_HOST = os.getenv('LIBRENMS_MYSQL_HOST')
+        MYSQL_PORT = os.getenv('LIBRENMS_MYSQL_PORT')
         MYSQL_USER = os.getenv('LIBRENMS_MYSQL_USER')
         MYSQL_PASSWORD = os.getenv('LIBRENMS_MYSQL_PASSWORD')
         cf = {
             'host': MYSQL_HOST,
+            'port': MYSQL_PORT,
             'user': MYSQL_USER,
             'password': MYSQL_PASSWORD,
             'database': 'librenms',

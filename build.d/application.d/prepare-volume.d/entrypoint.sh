@@ -19,6 +19,10 @@ if [[ -d /opt/librenms ]]; then
     tar xzf ${LIBRENMS_ARCHIVE} --preserve-permissions --acls --strip-components=2 || exit 2
     chown -R librenms:librenms ${LIBRENMS_WORKDIR}/*
 
+    echo $(stamp) "[INFO] creating default health check"
+    rm -f ${LIBRENMS_WORKDIR}/html/healthz
+    touch ${LIBRENMS_WORKDIR}/html/healthz
+
     export LIBRENMS_DISPATCHER_POLLER_NAME=${LIBRENMS_DISPATCHER_POLLER_NAME:-$HOSTNAME}
     export LIBRENMS_DISPATCHER_POLLER_GROUP=${LIBRENMS_DISPATCHER_POLLER_GROUP:-0}
     export LIBRENMS_DISPATCHER_POLLER_WORKERS=${LIBRENMS_DISPATCHER_POLLER_WORKERS:-24}

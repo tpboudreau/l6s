@@ -3,7 +3,7 @@ FROM alpine:latest
 
 RUN apk update && \
     apk upgrade && \
-    apk add --no-cache bind-tools curl libmemcached mariadb-client redis rrdtool wget
+    apk add --no-cache bind-tools curl libmemcached mariadb-client net-snmp-tools redis rrdtool wget
 
 COPY commands environment.sh /
 
