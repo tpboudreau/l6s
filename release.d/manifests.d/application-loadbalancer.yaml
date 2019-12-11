@@ -3,7 +3,10 @@ kind: Service
 metadata:
   name: application
 spec:
-  type: ClusterIP
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  externalTrafficPolicy: Local
   selector:
     component: application
   ports:

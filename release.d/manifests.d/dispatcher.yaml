@@ -65,6 +65,7 @@ spec:
       containers:
       - name: dispatcher
         image: docker.io/tpboudreau/librenms-dispatcher:0.1
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: application

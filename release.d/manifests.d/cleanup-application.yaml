@@ -10,7 +10,8 @@ spec:
         spec:
           containers:
           - name: cleanup-application
-            image: docker.io/tpboudreau/librenms-cleanup-application
+            image: docker.io/tpboudreau/librenms-cleanup-application:0.1
+            imagePullPolicy: Always
             envFrom:
             - configMapRef:
                 name: application
