@@ -71,13 +71,6 @@ RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
 COPY dispatcher.d/entrypoint.sh /entrypoint.sh
 COPY common.d/services.sh /services.sh
 
-ENV LIBRENMS_DISPATCHER_POLLER_NAME=poller \
-    LIBRENMS_DISPATCHER_POLLER_GROUP=0 \
-    LIBRENMS_DISPATCHER_POLLER_WORKERS=24 \
-    LIBRENMS_DISPATCHER_DISCOVERY_WORKERS=16 \
-    LIBRENMS_DISPATCHER_SERVICES_WORKERS=8 \
-    LIBRENMS_DISPATCHER_LOG_LEVEL=
-
 USER librenms
 
 ENTRYPOINT ["/entrypoint.sh"]

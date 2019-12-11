@@ -7,15 +7,24 @@ alias stamp='date --utc "+[%FT%T]"'
 
 . /services.sh
 
-if [ "${LIBRENMS_DISPATCHER_PLATFORM}" = "kubernetes" ]
+if [[ -z "${LIBRENMS_DISPATCHER_POLLER_GROUP}" ]]
 then
-  echo $(stamp) "[INFO] detected kubernetes platform"
+  echo $(stamp) "[INFO] attempting to determine poller group from hostname"
   export G=$(echo ${HOSTNAME} | sed 's/.*-//')
-  export N="cluster-dispatcher-${G}"
   LIBRENMS_DISPATCHER_POLLER_GROUP=${G:0}
-  LIBRENMS_DISPATCHER_POLLER_NAME=${N}
-else
-  LIBRENMS_DISPATCHER_POLLER_GROUP=${LIBRENMS_DISPATCHER_POLLER_GROUP:0}
+fi
+
+rx='^[0-9]+$'
+if ! [[ ${LIBRENMS_DISPATCHER_POLLER_GROUP} =~ $rx ]]
+then
+  echo $(stamp) "[WARNING] detected non-numeric poller group value"
+  LIBRENMS_DISPATCHER_POLLER_GROUP=0
+fi
+
+if [[ -z "${LIBRENMS_DISPATCHER_POLLER_NAME}" ]]
+then
+  echo $(stamp) "[INFO] assigning poller name using poller group value"
+  LIBRENMS_DISPATCHER_POLLER_NAME="dispatcher-${LIBRENMS_DISPATCHER_POLLER_GROUP}"
 fi
 
 echo $(stamp) "[INFO] service environment: "
@@ -39,7 +48,6 @@ unset $(cat ${LIBRENMS_WORKDIR}/.env | grep '=' | sed s/=.*$//)
 echo $(stamp) "[INFO] configuring dispatcher"
 ( cat /tmp/librenms.config.php /tmp/librenms.dispatcher.config.php | envsubst "$(printf '${%s} ' ${!LIBRENMS*})" > ${LIBRENMS_WORKDIR}/config.php && \
   chmod 640 ${LIBRENMS_WORKDIR}/config.php ) || exit 2
-
 
 echo $(stamp) "[INFO] starting dispatcher"
 exec ./librenms-service.py -t -g ${LIBRENMS_DISPATCHER_POLLER_GROUP} ${LIBRENMS_DISPATCHER_LOG_LEVEL}

@@ -4,12 +4,13 @@ $config['user'] = 'librenms';
 $config['distributed_poller'] = true;
 $config['auth_mechanism'] = 'mysql';
 $config['update'] = 0;
+$config['base_url'] = '${LIBRENMS_BASE_URL}';
 
-$config['db_host'] = '$LIBRENMS_MYSQL_HOST';
-$config['db_port'] = '$LIBRENMS_MYSQL_PORT';
-$config['db_user'] = '$LIBRENMS_MYSQL_USER';
-$config['db_pass'] = '$LIBRENMS_MYSQL_PASSWORD';
-$config['db_name'] = '$LIBRENMS_MYSQL_DATABASE';
+$config['db_host'] = '${LIBRENMS_MYSQL_HOST}';
+$config['db_port'] = '${LIBRENMS_MYSQL_PORT}';
+$config['db_user'] = '${LIBRENMS_MYSQL_USER}';
+$config['db_pass'] = '${LIBRENMS_MYSQL_PASSWORD}';
+$config['db_name'] = '${LIBRENMS_MYSQL_DATABASE}';
 $config['db_socket'] = '';
 
 $config['rrd_dir'] = '/opt/librenms/rrd';
