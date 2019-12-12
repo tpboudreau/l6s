@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: librenms
+  name: mysql
+spec:
+  type: ClusterIP
+  selector:
+    component: mysql
+  ports:
+  - name: mysql
+    port: 3306
+    targetPort: mysql
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: librenms
+  name: mysql
+  labels:
+    application: librenms
+spec:
+  serviceName: mysql
+  selector:
+    matchLabels:
+      component: mysql
+  replicas: 1
+  template:
+   metadata:
+     namespace: librenms
+     name: mysql
+     labels:
+       application: librenms
+       component: mysql
+   spec:
+     initContainers:
+     - name: mysql-prepare-volume
+       image: docker.io/tpboudreau/librenms-mysql-prepare-volume:0.1
+       envFrom:
+       - configMapRef:
+           name: mysql
+       volumeMounts:
+       - name: mysql-volume
+         subPath: configuration
+         mountPath: /configuration
+       - name: mysql-volume
+         subPath: database
+         mountPath: /database
+       - name: mysql-volume
+         subPath: initialization
+         mountPath: /initialization
+     containers:
+     - name: mysql
+       image: docker.io/tpboudreau/librenms-mysql:0.1
+       envFrom:
+       - configMapRef:
+           name: mysql
+       env:
+       - name: MYSQL_ROOT_PASSWORD
+         valueFrom:
+           secretKeyRef:
+             name: application
+             key: mysql_root_password
+       - name: MYSQL_USER
+         valueFrom:
+           secretKeyRef:
+             name: application
+             key: librenms_mysql_user
+       - name: MYSQL_PASSWORD
+         valueFrom:
+           secretKeyRef:
+             name: application
+             key: librenms_mysql_password
+       volumeMounts:
+       - name: mysql-volume
+         subPath: configuration
+         mountPath: /etc/mysql/conf.d
+       - name: mysql-volume
+         subPath: database
+         mountPath: /var/lib/mysql
+       - name: mysql-volume
+         subPath: initialization
+         mountPath: /docker-entrypoint-initdb.d
+       ports:
+       - name: mysql
+         containerPort: 33306
+         protocol: TCP
+     volumes:
+      - name: mysql-volume
+        emptyDir: {}

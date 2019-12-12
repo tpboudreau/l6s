@@ -1,6 +1,6 @@
 apiVersion: v2
-name: librenms
-description: LibreNMS
+name: librenms-services
+description: LibreNMS supporting services
 
 # A chart can be either an 'application' or a 'library' chart.
 #

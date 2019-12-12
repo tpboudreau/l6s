@@ -1,0 +1,40 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  namespace: librenms
+  name: cleanup-application
+spec:
+  schedule: "30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cleanup-application
+            image: docker.io/tpboudreau/librenms-cleanup-application:0.1
+            imagePullPolicy: Always
+            envFrom:
+            - configMapRef:
+                name: application
+            env:
+            - name: LIBRENMS_MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: application
+                  key: librenms_mysql_user
+            - name: LIBRENMS_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: application
+                  key: librenms_mysql_password
+            - name: LIBRENMS_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: application
+                  key: librenms_redis_password
+            - name: LIBRENMS_APPLICATION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: application
+                  key: librenms_application_key
+          restartPolicy: Never

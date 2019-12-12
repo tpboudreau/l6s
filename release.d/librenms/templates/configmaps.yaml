@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: librenms
+  name: application
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "1"
+data:
+  LIBRENMS_MYSQL_DATABASE: librenms
+  LIBRENMS_BASE_URL: http://138.197.239.217/
+  #LIBRENMS_ADMINISTRATIVE_ADDRESSES: 127.0.0.1,10.0.0.0/8,73.162.192.236
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: librenms
+  name: dispatcher
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "1"
+data:
+  LIBRENMS_DISPATCHER_POLLER_WORKERS: "24"
+  LIBRENMS_DISPATCHER_DISCOVERY_WORKERS: "16"
+  LIBRENMS_DISPATCHER_SERVICES_WORKERS: "8"
+  LIBRENMS_DISPATCHER_LOG_LEVEL: -v

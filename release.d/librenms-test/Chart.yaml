@@ -1,6 +1,6 @@
 apiVersion: v2
-name: librenms
-description: LibreNMS
+name: librenms-test
+description: LibreNMS test devices and test console
 
 # A chart can be either an 'application' or a 'library' chart.
 #
