@@ -4,6 +4,9 @@ WIP LibreNMS k8s+helm
 Options for databases instances (mysql and rrdcached):
 
 - cluster (typical clusterip service created; pods are created to run mysql and rrdcached) [default]
+  - with ephemeral storage
+  - with pre-provisioned persistent storage
+  - with dynamically provisioned persisten storage
 - external (non-selecting clusterip service created + endpoints routing to provided address:port) [GR]
 
 Options for application service (for webUI/API):
