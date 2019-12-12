@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  namespace: librenms
+  namespace: {{ .Values.Namespace }}
   name: test-console
   labels:
     application: librenms

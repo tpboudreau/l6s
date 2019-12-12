@@ -1,7 +1,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  namespace: librenms
+  namespace: {{ .Values.Namespace }}
   name: cleanup-application
 spec:
   schedule: "30 * * * *"

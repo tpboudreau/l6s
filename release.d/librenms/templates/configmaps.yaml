@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: librenms
+  namespace: {{ .Values.Namespace }}
   name: application
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -10,13 +10,13 @@ metadata:
     "helm.sh/hook-weight": "1"
 data:
   LIBRENMS_MYSQL_DATABASE: librenms
-  LIBRENMS_BASE_URL: http://138.197.239.217/
-  #LIBRENMS_ADMINISTRATIVE_ADDRESSES: 127.0.0.1,10.0.0.0/8,73.162.192.236
+  LIBRENMS_BASE_URL: {{ .Values.IngressURL }}
+  LIBRENMS_ADMINISTRATIVE_ADDRESSES: {{ .Values.AdministrativeAddresses | default "" }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: librenms
+  namespace: {{ .Values.Namespace }}
   name: dispatcher
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"

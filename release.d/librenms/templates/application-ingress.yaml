@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1beta1
 #apiVersion: extensions/v1beta1 
 kind: Ingress
 metadata:
-  namespace: librenms
+  namespace: {{ .Values.Namespace }}
   name: application
   annotations:
     kubernetes.io/ingress.class: "nginx"
@@ -19,7 +19,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: librenms
+  namespace: {{ .Values.Namespace }}
   name: application
 spec:
   type: NodePort
@@ -33,7 +33,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: librenms
+  namespace: {{ .Values.Namespace }}
   name: application
   labels:
     application: librenms
@@ -44,7 +44,7 @@ spec:
       component: application
   template:
     metadata:
-      namespace: librenms
+      namespace: {{ .Values.Namespace }}
       name: application
       labels:
         application: librenms

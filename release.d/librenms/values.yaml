@@ -2,3 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+Namespace: "librenmsx"
+
+IngressURL: "http://138.197.239.217/"
+

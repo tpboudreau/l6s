@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: librenms
+  namespace: {{ .Values.Namespace }}
   name: dispatcher
 spec:
   clusterIP: None
@@ -9,7 +9,7 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  namespace: librenms
+  namespace: {{ .Values.Namespace }}
   name: dispatcher
   labels:
     application: librenms
@@ -21,7 +21,7 @@ spec:
   replicas: 4
   template:
     metadata:
-      namespace: librenms
+      namespace: {{ .Values.Namespace }}
       name: dispatcher
       labels:
         application: librenms

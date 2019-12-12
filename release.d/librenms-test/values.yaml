@@ -1,4 +1,24 @@
-# Default values for librenms-services.
+# Default values for librenms.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+Namespace: "librenmsxxx"
+
+Devices:
+- DeviceName: "test-device-zero"
+  SNMPVersion: "v2c"
+- DeviceName: "test-device-one"
+  SNMPVersion: "v2c"
+- DeviceName: "test-device-two"
+  SNMPVersion: "v2c"
+- DeviceName: "test-device-three"
+  SNMPVersion: "v2c"
+- DeviceName: "test-device-alpha"
+  SNMPVersion: "v3"
+- DeviceName: "test-device-beta"
+  SNMPVersion: "v3"
+- DeviceName: "test-device-gamma"
+  SNMPVersion: "v3"
+- DeviceName: "test-device-delta"
+  SNMPVersion: "v3"
 

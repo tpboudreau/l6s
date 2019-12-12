@@ -1,0 +1,35 @@
+{{ range .Values.Devices }}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ $.Values.Namespace }}
+  name: {{ .DeviceName }}
+spec:
+  clusterIP: None
+  selector:
+    component: {{ .DeviceName }}
+  ports:
+  - port: 161
+    targetPort: 161
+    protocol: UDP
+    name: snmp-udp
+  - port: 161
+    targetPort: 161
+    protocol: TCP
+    name: snmp-tcp
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: {{ $.Values.Namespace }}
+  name: {{ .DeviceName }}
+  labels:
+    application: librenms
+    component: {{ .DeviceName }}
+spec:
+  containers:
+  - name: device
+    image: docker.io/tpboudreau/librenms-device-{{ .SNMPVersion }}
+    imagePullPolicy: Always
+---
+{{ end }}
