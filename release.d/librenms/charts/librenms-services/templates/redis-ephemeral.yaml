@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: librenms
+  namespace: {{ .Values.Namespace }}
   name: redis
 spec:
   type: ClusterIP
@@ -15,7 +15,7 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  namespace: librenms
+  namespace: {{ .Values.Namespace }}
   name: redis
   labels:
     application: librenms
@@ -27,7 +27,7 @@ spec:
   replicas: 1
   template:
     metadata:
-      namespace: librenms
+      namespace: {{ .Values.Namespace }}
       name: redis
       labels:
         application: librenms

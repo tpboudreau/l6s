@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  namespace: librenms
+  namespace: {{ .Values.Namespace }}
   name: prepare-mysql
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -9,9 +9,10 @@ metadata:
     "helm.sh/hook": post-install
     "helm.sh/hook-weight": "0"
 spec:
+  ttlSecondsAfterFinished: 300
   template:
     metadata:
-      namespace: librenms
+      namespace: {{ .Values.Namespace }}
       name: prepare-mysql
       labels:
         application: librenms

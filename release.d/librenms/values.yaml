@@ -1,8 +1,8 @@
-# Default values for librenms.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
-Namespace: "librenmsx"
-
+Namespace: "librenms"
 IngressURL: "http://138.197.239.217/"
+DispatcherCount: 4
+
+global:
+   enableTestDevices: true
 
