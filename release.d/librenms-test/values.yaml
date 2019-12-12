@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-Namespace: "librenmsxxx"
+Namespace: "librenms"
 
 Devices:
 - DeviceName: "test-device-zero"
