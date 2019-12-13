@@ -1,0 +1,47 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: mysql-volume
+  labels:
+    forProvider: mysql
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+  - ReadWriteOnce
+  volumeMode: Filesystem
+  gcePersistentDisk:
+    fsType: ext4
+    pdName: gr-l6s-mysql
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: rrdcached-volume
+  labels:
+    forProvider: rrdcached
+spec:
+  capacity:
+    storage: 500Gi
+  accessModes:
+  - ReadWriteOnce
+  volumeMode: Filesystem
+  gcePersistentDisk:
+    fsType: ext4
+    pdName: gr-l6s-rrdcached
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: redis-volume
+  labels:
+    forProvider: redis
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+  - ReadWriteOnce
+  volumeMode: Filesystem
+  gcePersistentDisk:
+    fsType: ext4
+    pdName: gr-l6s-redis
