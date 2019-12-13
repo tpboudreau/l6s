@@ -38,7 +38,7 @@ metadata:
   labels:
     application: librenms
 spec:
-  replicas: 1
+  replicas: {{ .Values.Application.replicas }}
   selector:
     matchLabels:
       component: application

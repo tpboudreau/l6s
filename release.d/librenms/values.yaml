@@ -15,9 +15,10 @@ Application:
   nginxImage:
     repository: "docker.io/tpboudreau/librenms-application-nginx"
     tag: "0.1"
+  replicas: 1
 
 Dispatcher:
-  count: 4
+  instances: 4
   pollerWorkers: 24
   discoveryWorkers: 16
   serviceWorkers: 8

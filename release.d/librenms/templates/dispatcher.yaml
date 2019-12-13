@@ -18,7 +18,7 @@ spec:
   selector:
     matchLabels:
       component: dispatcher
-  replicas: {{ .Values.Dispatcher.count }}
+  replicas: {{ .Values.Dispatcher.instances }}
   template:
     metadata:
       namespace: {{ .Values.Namespace }}

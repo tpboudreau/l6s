@@ -4,14 +4,38 @@ metadata:
   namespace: {{ .Values.Namespace }}
   name: rrdcached
 spec:
+  {{- if .Values.rrdcached.external.enabled }}
+  type: ClusterIP
+  selector: {}
+  ports:
+  - name: rrdcached
+    protocol: TCP
+    port: {{ .Values.rrdcached.servicePort }}
+    targetPort: {{ required "the external rrdcached server port must be provided (rrdcached.external.port)" .Values.rrdcached.external.port }}
+  {{- else }}
   type: ClusterIP
   selector:
     component: rrdcached
   ports:
   - name: rrdcached
+    protocol: TCP
     port: {{ .Values.rrdcached.servicePort }}
     targetPort: rrdcached
+  {{- end }}
 ---
+{{- if .Values.rrdcached.external.enabled }}
+kind: Endpoints
+apiVersion: v1
+metadata:
+  namespace: {{ .Values.Namespace }}
+  name: rrdcached
+subsets:
+- addresses:
+  - ip: {{ required "the external rrdcached server address must be provided (rrdcached.external.address)" .Values.rrdcached.external.address }}
+  ports:
+  - name: rrdcached
+    port: {{ required "the external rrdcached server port must be provided (rrdcached.external.port)" .Values.rrdcached.external.port }}
+{{- else }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -53,3 +77,4 @@ spec:
       volumes:
       - name: rrdcached-volume
         emptyDir: {}
+{{- end }}

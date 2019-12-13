@@ -4,14 +4,38 @@ metadata:
   namespace: {{ .Values.Namespace }}
   name: mysql
 spec:
+  {{- if .Values.mysql.external.enabled }}
+  type: ClusterIP
+  selector: {}
+  ports:
+  - name: mysql
+    protocol: TCP
+    port: {{ .Values.mysql.servicePort }}
+    targetPort: {{ required "the external MySQL database port must be provided (mysql.external.port)" .Values.mysql.external.port }}
+  {{- else }}
   type: ClusterIP
   selector:
     component: mysql
   ports:
   - name: mysql
+    protocol: TCP
     port: {{ .Values.mysql.servicePort }}
     targetPort: mysql
+  {{- end }}
 ---
+{{- if .Values.mysql.external.enabled }}
+kind: Endpoints
+apiVersion: v1
+metadata:
+  namespace: {{ .Values.Namespace }}
+  name: mysql
+subsets:
+- addresses:
+  - ip: {{ required "the external MySQL database address must be provided (mysql.external.address)" .Values.mysql.external.address }}
+  ports:
+  - name: mysql
+    port: {{ required "the external MySQL database port must be provided (mysql.external.port)" .Values.mysql.external.port }}
+{{- else }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -88,3 +112,4 @@ spec:
       volumes:
        - name: mysql-volume
          emptyDir: {}
+{{- end }}
