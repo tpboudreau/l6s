@@ -1,0 +1,6 @@
+apiVersion: v2
+name: librenms-test-device
+description: LibreNMS test devices
+type: application
+version: 0.0.0
+appVersion: 1.58

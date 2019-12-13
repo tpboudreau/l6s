@@ -9,7 +9,7 @@ spec:
     component: memcached
   ports:
   - name: memcached
-    port: 11211
+    port: {{ .Values.memcached.servicePort }}
     targetPort: memcached
 ---
 apiVersion: apps/v1
@@ -35,11 +35,11 @@ spec:
     spec:
       containers:
       - name: memcached
-        image: docker.io/tpboudreau/librenms-memcached:0.1
+        image: {{ .Values.memcached.image.repository }}:{{ .Values.memcached.image.tag }}
         envFrom:
           - configMapRef:
               name: memcached
         ports:
         - name: memcached
-          containerPort: 11211
+          containerPort: {{ .Values.memcached.providerPort }}
           protocol: TCP

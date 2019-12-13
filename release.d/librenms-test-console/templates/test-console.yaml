@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
   - name: console
-    image: docker.io/tpboudreau/librenms-console
+    image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
     imagePullPolicy: Always
     env:
     - name: LIBRENMS_MYSQL_USER

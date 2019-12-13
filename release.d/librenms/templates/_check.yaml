@@ -1,0 +1,43 @@
+{{- define "librenms.checks" }}
+- name: check-mysql
+  image: {{ .Values.checkMySQL.image.repository }}:{{ .Values.checkMySQL.image.tag }}
+  imagePullPolicy: Always
+  envFrom:
+  - configMapRef:
+      name: application
+  env:
+  - name: LIBRENMS_MYSQL_USER
+    valueFrom:
+      secretKeyRef:
+        name: application
+        key: librenms_mysql_user
+  - name: LIBRENMS_MYSQL_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: application
+        key: librenms_mysql_password
+- name: check-rrdcached
+  image: {{ .Values.checkRRDcached.image.repository }}:{{ .Values.checkRRDcached.image.tag }}
+  imagePullPolicy: Always
+  envFrom:
+  - configMapRef:
+      name: application
+- name: check-memcached
+  image: {{ .Values.checkMemcached.image.repository }}:{{ .Values.checkMemcached.image.tag }}
+  imagePullPolicy: Always
+  envFrom:
+  - configMapRef:
+      name: application
+- name: check-redis
+  image: {{ .Values.checkRedis.image.repository }}:{{ .Values.checkRedis.image.tag }}
+  imagePullPolicy: Always
+  envFrom:
+  - configMapRef:
+      name: application
+  env:
+  - name: LIBRENMS_REDIS_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: application
+        key: librenms_redis_password
+{{- end }}

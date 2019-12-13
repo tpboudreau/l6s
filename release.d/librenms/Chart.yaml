@@ -1,6 +1,15 @@
+
 apiVersion: v2
 name: librenms
 description: LibreNMS
 type: application
 version: 0.0.0
 appVersion: 1.58
+
+#dependencies:
+#- name: services
+#- name: test-console
+#  condition: test.console.enabled
+#- name: test-device
+#  condition: test.device.enabled
+

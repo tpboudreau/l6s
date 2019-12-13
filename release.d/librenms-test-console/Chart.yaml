@@ -1,0 +1,6 @@
+apiVersion: v2
+name: librenms-test-console
+description: LibreNMS test console
+type: application
+version: 0.0.0
+appVersion: 1.58

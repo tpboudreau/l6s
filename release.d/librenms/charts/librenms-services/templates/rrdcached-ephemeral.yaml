@@ -9,7 +9,7 @@ spec:
     component: rrdcached
   ports:
   - name: rrdcached
-    port: 42217
+    port: {{ .Values.rrdcached.servicePort }}
     targetPort: rrdcached
 ---
 apiVersion: apps/v1
@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
       - name: rrdcached
-        image: docker.io/tpboudreau/librenms-rrdcached:0.1
+        image: {{ .Values.rrdcached.image.repository }}:{{ .Values.rrdcached.image.tag }}
         envFrom:
         - configMapRef:
             name: rrdcached
@@ -48,7 +48,7 @@ spec:
           mountPath: /journal
         ports:
         - name: rrdcached
-          containerPort: 42217
+          containerPort: {{ .Values.rrdcached.providerPort }}
           protocol: TCP
       volumes:
       - name: rrdcached-volume

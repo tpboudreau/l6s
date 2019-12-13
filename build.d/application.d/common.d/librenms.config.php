@@ -48,3 +48,5 @@ $config['sfdp'] = '/usr/bin/sfdp';
 
 $config['snmp']['community'] = array('public');
 
+$config['php_memory_limit'] = '${LIBRENMS_MEMORY_LIMIT}';
+

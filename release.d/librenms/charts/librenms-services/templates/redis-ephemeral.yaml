@@ -9,7 +9,7 @@ spec:
     component: redis
   ports:
   - name: redis
-    port: 6379
+    port: {{ .Values.redis.servicePort }}
     targetPort: redis
 ---
 apiVersion: apps/v1
@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
       - name: redis
-        image: docker.io/tpboudreau/librenms-redis:0.1
+        image: {{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}
         envFrom:
         - configMapRef:
             name: redis
@@ -51,7 +51,7 @@ spec:
           mountPath: /data
         ports:
         - name: redis
-          containerPort: 36379
+          containerPort: {{ .Values.redis.providerPort }}
           protocol: TCP
       volumes:
       - name: redis-volume

@@ -1,8 +1,48 @@
 
 Namespace: "librenms"
-IngressURL: "http://138.197.239.217/"
-DispatcherCount: 4
 
-global:
-   enableTestDevices: true
+Application:
+  servicePort: 80
+  providerPort: 8000
+  baseURL: "http://138.197.239.217/"
+  memoryLimit: 1024
+  prepareVolumeImage:
+    repository: "docker.io/tpboudreau/librenms-application-prepare-volume"
+    tag: "0.1"
+  phpImage:
+    repository: "docker.io/tpboudreau/librenms-application-php-fpm"
+    tag: "0.1"
+  nginxImage:
+    repository: "docker.io/tpboudreau/librenms-application-nginx"
+    tag: "0.1"
+
+Dispatcher:
+  count: 4
+  pollerWorkers: 24
+  discoveryWorkers: 16
+  serviceWorkers: 8
+  logLevel: "-v"
+  image:
+    repository: "docker.io/tpboudreau/librenms-dispatcher"
+    tag: "0.1"
+
+checkMySQL:
+  image:
+    repository: "docker.io/tpboudreau/librenms-check-mysql"
+    tag: "0.1"
+
+checkRRDcached:
+  image:
+    repository: "docker.io/tpboudreau/librenms-check-rrdcached"
+    tag: "0.1"
+
+checkMemcached:
+  image:
+    repository: "docker.io/tpboudreau/librenms-check-memcached"
+    tag: "0.1"
+
+checkRedis:
+  image:
+    repository: "docker.io/tpboudreau/librenms-check-redis"
+    tag: "0.1"
 

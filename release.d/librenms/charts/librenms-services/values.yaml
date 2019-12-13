@@ -1,3 +1,47 @@
 
 Namespace: "librenms"
 
+mysql:
+  servicePort: 3306
+  providerPort: 33306
+  image:
+    repository: "docker.io/tpboudreau/librenms-mysql"
+    tag: "0.1"
+  prepareVolumeImage:
+    repository: "docker.io/tpboudreau/librenms-mysql-prepare-volume"
+    tag: "0.1"
+  prepareDatabaseImage:
+    repository: "docker.io/tpboudreau/librenms-prepare-mysql"
+    tag: "0.1"
+
+rrdcached:
+  servicePort: 42217
+  providerPort: 42217
+  chunkSize: 2
+  threadCount: 2
+  flushInterval: 600
+  writeInterval: 300
+  writeDelay: 5
+  logLevel: "LOG_NOTICE"
+  image:
+    repository: "docker.io/tpboudreau/librenms-rrdcached"
+    tag: "0.1"
+
+memcached:
+  servicePort: 11211
+  providerPort: 11211
+  threadCount: 2
+  connectionRequests: 10
+  logLevel: ""
+  image:
+    repository: "docker.io/tpboudreau/librenms-memcached"
+    tag: "0.1"
+
+redis:
+  servicePort: 6379
+  providerPort: 36379
+  logLevel: "notice"
+  image:
+    repository: "docker.io/tpboudreau/librenms-redis"
+    tag: "0.1"
+

@@ -29,7 +29,7 @@ metadata:
 spec:
   containers:
   - name: device
-    image: docker.io/tpboudreau/librenms-device-{{ .SNMPVersion }}
+    image: {{ $.Values.image.repositoryRoot }}-{{ .SNMPVersion }}:{{ $.Values.image.tag }}
     imagePullPolicy: Always
 ---
 {{ end }}

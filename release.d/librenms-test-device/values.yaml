@@ -1,8 +1,9 @@
-# Default values for librenms.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
 Namespace: "librenms"
+
+image:
+  repositoryRoot: "docker.io/tpboudreau/librenms-device"
+  tag: "0.1"
 
 Devices:
 - DeviceName: "test-device-zero"

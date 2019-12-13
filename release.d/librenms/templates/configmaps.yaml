@@ -9,8 +9,9 @@ metadata:
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "1"
 data:
-  LIBRENMS_MYSQL_DATABASE: librenms
-  LIBRENMS_BASE_URL: {{ .Values.IngressURL }}
+  LIBRENMS_MYSQL_DATABASE: "librenms"
+  LIBRENMS_MEMORY_LIMIT: {{ .Values.Application.memoryLimit | quote }}
+  LIBRENMS_BASE_URL: {{ .Values.Application.baseURL | quote }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -23,7 +24,7 @@ metadata:
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "1"
 data:
-  LIBRENMS_DISPATCHER_POLLER_WORKERS: "24"
-  LIBRENMS_DISPATCHER_DISCOVERY_WORKERS: "16"
-  LIBRENMS_DISPATCHER_SERVICES_WORKERS: "8"
-  LIBRENMS_DISPATCHER_LOG_LEVEL: -v
+  LIBRENMS_DISPATCHER_POLLER_WORKERS: {{ .Values.Dispatcher.pollerWorkers | quote }}
+  LIBRENMS_DISPATCHER_DISCOVERY_WORKERS: {{ .Values.Dispatcher.discoveryWorkers | quote }}
+  LIBRENMS_DISPATCHER_SERVICES_WORKERS: {{ .Values.Dispatcher.serviceWorkers | quote }}
+  LIBRENMS_DISPATCHER_LOG_LEVEL: {{ .Values.Dispatcher.logLevel | quote }}

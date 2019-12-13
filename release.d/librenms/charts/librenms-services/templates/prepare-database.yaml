@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   namespace: {{ .Values.Namespace }}
-  name: prepare-mysql
+  name: prepare-database
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
   annotations:
@@ -13,14 +13,14 @@ spec:
   template:
     metadata:
       namespace: {{ .Values.Namespace }}
-      name: prepare-mysql
+      name: prepare-database
       labels:
         application: librenms
         component: install
     spec:
       containers:
-      - name: prepare-mysql
-        image: docker.io/tpboudreau/librenms-prepare-mysql:0.1
+      - name: prepare-database
+        image: {{ .Values.mysql.prepareDatabaseImage.repository }}:{{ .Values.mysql.prepareDatabaseImage.tag }}
         envFrom:
         - configMapRef:
             name: application

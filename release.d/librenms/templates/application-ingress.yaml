@@ -14,7 +14,7 @@ spec:
       - path: /
         backend:
           serviceName: application
-          servicePort: 8000
+          servicePort: {{ .Values.Application.servicePort }}
 ---
 apiVersion: v1
 kind: Service
@@ -27,7 +27,7 @@ spec:
     component: application
   ports:
   - name: application
-    port: 8000
+    port: {{ .Values.Application.servicePort }}
     targetPort: application
 ---
 apiVersion: apps/v1
@@ -52,7 +52,7 @@ spec:
     spec:
       initContainers:
       - name: application-prepare-volume
-        image: docker.io/tpboudreau/librenms-application-prepare-volume:0.1
+        image: {{ .Values.Application.prepareVolumeImage.repository }}:{{ .Values.Application.prepareVolumeImage.tag }}
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
@@ -81,46 +81,10 @@ spec:
         volumeMounts:
         - name: application-volume
           mountPath: /opt/librenms
-      - name: check-mysql
-        image: docker.io/tpboudreau/librenms-check-mysql:0.1
-        envFrom:
-        - configMapRef:
-            name: application
-        env:
-        - name: LIBRENMS_MYSQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: application
-              key: librenms_mysql_user
-        - name: LIBRENMS_MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: application
-              key: librenms_mysql_password
-      - name: check-rrdcached
-        image: docker.io/tpboudreau/librenms-check-rrdcached:0.1
-        envFrom:
-        - configMapRef:
-            name: application
-      - name: check-memcached
-        image: docker.io/tpboudreau/librenms-check-memcached:0.1
-        envFrom:
-        - configMapRef:
-            name: application
-      - name: check-redis
-        image: docker.io/tpboudreau/librenms-check-redis:0.1
-        envFrom:
-        - configMapRef:
-            name: application
-        env:
-        - name: LIBRENMS_REDIS_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: application
-              key: librenms_redis_password
+      {{- include "librenms.checks" . | indent 6 }}
       containers:
       - name: application-php-fpm
-        image: docker.io/tpboudreau/librenms-application-php-fpm:0.1
+        image: {{ .Values.Application.phpImage.repository }}:{{ .Values.Application.phpImage.tag }}
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
@@ -131,7 +95,7 @@ spec:
         - name: application-socket
           mountPath: /sock
       - name: application-nginx
-        image: docker.io/tpboudreau/librenms-application-nginx:0.1
+        image: {{ .Values.Application.nginxImage.repository }}:{{ .Values.Application.nginxImage.tag }}
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
@@ -143,7 +107,7 @@ spec:
           mountPath: /sock
         ports:
         - name: application
-          containerPort: 8000
+          containerPort: {{ .Values.Application.providerPort }}
           protocol: TCP
       volumes:
       - name: application-volume
