@@ -12,6 +12,7 @@ data:
   LIBRENMS_MYSQL_DATABASE: "librenms"
   LIBRENMS_MEMORY_LIMIT: {{ .Values.Application.memoryLimit | quote }}
   LIBRENMS_BASE_URL: {{ .Values.Application.baseURL | quote }}
+  LIBRENMS_SNMP_RTT: {{ .Values.Application.snmpRTT | quote }}
 ---
 apiVersion: v1
 kind: ConfigMap

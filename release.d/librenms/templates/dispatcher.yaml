@@ -31,7 +31,11 @@ spec:
       {{- include "librenms.checks" . | indent 6 }}
       containers:
       - name: dispatcher
+        {{- if .Values.snmpPing }}
+        image: {{ .Values.Dispatcher.image.repository }}-sping:{{ .Values.Dispatcher.image.tag }}
+        {{- else }}
         image: {{ .Values.Dispatcher.image.repository }}:{{ .Values.Dispatcher.image.tag }}
+        {{- end }}
         imagePullPolicy: Always
         envFrom:
         - configMapRef:

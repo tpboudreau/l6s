@@ -1,11 +1,14 @@
 
 Namespace: "librenms"
 
+snmpPing: false
+
 Application:
   servicePort: 80
   providerPort: 8000
   baseURL: "http://138.197.239.217/"
   memoryLimit: 1024
+  #snmpRTT: "true"
   prepareVolumeImage:
     repository: "docker.io/tpboudreau/librenms-application-prepare-volume"
     tag: "0.1"
@@ -45,5 +48,10 @@ checkMemcached:
 checkRedis:
   image:
     repository: "docker.io/tpboudreau/librenms-check-redis"
+    tag: "0.1"
+
+cleanupApplication:
+  image:
+    repository: "docker.io/tpboudreau/librenms-cleanup-application"
     tag: "0.1"
 

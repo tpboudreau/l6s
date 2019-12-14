@@ -1,0 +1,777 @@
+NAME: librenms-1576283475
+LAST DEPLOYED: Sat Dec 14 00:31:15 2019
+NAMESPACE: default
+STATUS: pending-install
+REVISION: 1
+TEST SUITE: None
+HOOKS:
+---
+# Source: librenms/charts/librenms-services/templates/configmaps.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: librenms
+  name: mysql
+  labels:
+    helm.sh/chart: "librenms-services-0.0.0"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "1"
+data:
+  MYSQL_INITDB_SKIP_TZINFO: "yes"
+  MYSQL_DATABASE: "librenms"
+---
+# Source: librenms/charts/librenms-services/templates/configmaps.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: librenms
+  name: rrdcached
+  labels:
+    helm.sh/chart: "librenms-services-0.0.0"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "1"
+data:
+  RRDCACHED_CHUNK_SIZE: "2"
+  RRDCACHED_THREAD_COUNT: "2"
+  RRDCACHED_FLUSH_INTERVAL: "600"
+  RRDCACHED_WRITE_INTERVAL: "300"
+  RRDCACHED_WRITE_DELAY: "5"
+  RRDCACHED_LOG_LEVEL: "LOG_NOTICE"
+---
+# Source: librenms/charts/librenms-services/templates/configmaps.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: librenms
+  name: memcached
+  labels:
+    helm.sh/chart: "librenms-services-0.0.0"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "1"
+data:
+  MEMCACHED_THREAD_COUNT: "2"
+  MEMCACHED_CONNECTION_REQUESTS: "10"
+  MEMCACHED_LOG_LEVEL: ""
+---
+# Source: librenms/charts/librenms-services/templates/configmaps.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: librenms
+  name: redis
+  labels:
+    helm.sh/chart: "librenms-services-0.0.0"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "1"
+data:
+  REDIS_LOG_LEVEL: "notice"
+---
+# Source: librenms/templates/configmaps.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: librenms
+  name: application
+  labels:
+    helm.sh/chart: "librenms-0.0.0"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "1"
+data:
+  LIBRENMS_MYSQL_DATABASE: "librenms"
+  LIBRENMS_MEMORY_LIMIT: "1024"
+  LIBRENMS_BASE_URL: "http://138.197.239.217/"
+  LIBRENMS_SNMP_RTT:
+---
+# Source: librenms/templates/configmaps.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: librenms
+  name: dispatcher
+  labels:
+    helm.sh/chart: "librenms-0.0.0"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "1"
+data:
+  LIBRENMS_DISPATCHER_POLLER_WORKERS: "24"
+  LIBRENMS_DISPATCHER_DISCOVERY_WORKERS: "16"
+  LIBRENMS_DISPATCHER_SERVICES_WORKERS: "8"
+  LIBRENMS_DISPATCHER_LOG_LEVEL: "-v"
+---
+# Source: librenms/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: librenms
+  name: application
+  labels:
+    helm.sh/chart: "librenms-0.0.0"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "0"
+type: Opaque
+data:
+  mysql_root_password: bCFiciNubSU=
+  librenms_mysql_user: bGlicmVubXM=
+  librenms_mysql_password: TDFicjNOTTU=
+  librenms_redis_password: UjNkMXM=
+  librenms_administrative_user: YWRtaW5pc3RyYXRvcg==
+  librenms_administrative_password: QGRtaW5pc3RyYXQwcg==
+  librenms_administrative_email: YWRtaW5pc3RyYXRvckBleGFtcGxlLm9yZw==
+  librenms_application_key: YmFzZTY0OkQrUmFsRWlnSTdTZTMzRFhXS1lVRTlaV09wN2lYMS9aU253a0JVTDNHeU09
+---
+# Source: librenms/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: librenms
+  labels:
+    helm.sh/chart: "librenms-0.0.0"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-1"
+---
+# Source: librenms/charts/librenms-services/templates/prepare-database.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  namespace: librenms
+  name: prepare-database
+  labels:
+    helm.sh/chart: "librenms-services-0.0.0"
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "0"
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      namespace: librenms
+      name: prepare-database
+      labels:
+        application: librenms
+        component: install
+    spec:
+      containers:
+      - name: prepare-database
+        image: docker.io/tpboudreau/librenms-prepare-mysql:0.1
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+        - name: LIBRENMS_ADMINISTRATIVE_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_administrative_user
+        - name: LIBRENMS_ADMINISTRATIVE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_administrative_password
+        - name: LIBRENMS_ADMINISTRATIVE_EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_administrative_email
+        - name: LIBRENMS_APPLICATION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_application_key
+      restartPolicy: Never
+  backoffLimit: 3
+MANIFEST:
+---
+# Source: librenms/charts/librenms-services/templates/memcached.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: librenms
+  name: memcached
+spec:
+  type: ClusterIP
+  selector:
+    component: memcached
+  ports:
+  - name: memcached
+    port: 11211
+    targetPort: memcached
+---
+# Source: librenms/charts/librenms-services/templates/mysql-ephemeral.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: librenms
+  name: mysql
+spec:
+  type: ClusterIP
+  selector:
+    component: mysql
+  ports:
+  - name: mysql
+    protocol: TCP
+    port: 3306
+    targetPort: mysql
+---
+# Source: librenms/charts/librenms-services/templates/redis-ephemeral.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: librenms
+  name: redis
+spec:
+  type: ClusterIP
+  selector:
+    component: redis
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: redis
+---
+# Source: librenms/charts/librenms-services/templates/rrdcached-ephemeral.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: librenms
+  name: rrdcached
+spec:
+  type: ClusterIP
+  selector:
+    component: rrdcached
+  ports:
+  - name: rrdcached
+    protocol: TCP
+    port: 42217
+    targetPort: rrdcached
+---
+# Source: librenms/templates/application-ingress.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: librenms
+  name: application
+spec:
+  type: NodePort
+  selector:
+    component: application
+  ports:
+  - name: application
+    port: 80
+    targetPort: application
+---
+# Source: librenms/templates/dispatcher.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: librenms
+  name: dispatcher
+spec:
+  clusterIP: None
+---
+# Source: librenms/templates/application-ingress.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: librenms
+  name: application
+  labels:
+    application: librenms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: application
+  template:
+    metadata:
+      namespace: librenms
+      name: application
+      labels:
+        application: librenms
+        component: application
+    spec:
+      initContainers:
+      - name: application-prepare-volume
+        image: docker.io/tpboudreau/librenms-application-prepare-volume:0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+        - name: LIBRENMS_APPLICATION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_application_key
+        volumeMounts:
+        - name: application-volume
+          mountPath: /opt/librenms      
+      - name: check-mysql
+        image: docker.io/tpboudreau/librenms-check-mysql:0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+      - name: check-rrdcached
+        image: docker.io/tpboudreau/librenms-check-rrdcached:0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: check-memcached
+        image: docker.io/tpboudreau/librenms-check-memcached:0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: check-redis
+        image: docker.io/tpboudreau/librenms-check-redis:0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+      containers:
+      - name: application-php-fpm
+        image: docker.io/tpboudreau/librenms-application-php-fpm:0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: application
+        volumeMounts:
+        - name: application-volume
+          mountPath: /opt/librenms
+        - name: application-socket
+          mountPath: /sock
+      - name: application-nginx
+        image: docker.io/tpboudreau/librenms-application-nginx:0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: application
+        volumeMounts:
+        - name: application-volume
+          mountPath: /opt/librenms
+        - name: application-socket
+          mountPath: /sock
+        ports:
+        - name: application
+          containerPort: 8000
+          protocol: TCP
+      volumes:
+      - name: application-volume
+        emptyDir: {}
+      - name: application-socket
+        emptyDir:
+          medium: Memory
+---
+# Source: librenms/charts/librenms-services/templates/memcached.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: librenms
+  name: memcached
+  labels:
+    application: librenms
+spec:
+  serviceName: memcached
+  selector:
+    matchLabels:
+      component: memcached
+  replicas: 1
+  template:
+    metadata:
+      namespace: librenms
+      name: memcached
+      labels:
+        application: librenms
+        component: memcached
+    spec:
+      containers:
+      - name: memcached
+        image: docker.io/tpboudreau/librenms-memcached:0.1
+        envFrom:
+          - configMapRef:
+              name: memcached
+        ports:
+        - name: memcached
+          containerPort: 11211
+          protocol: TCP
+---
+# Source: librenms/charts/librenms-services/templates/mysql-ephemeral.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: librenms
+  name: mysql
+  labels:
+    application: librenms
+spec:
+  serviceName: mysql
+  selector:
+    matchLabels:
+      component: mysql
+  replicas: 1
+  template:
+    metadata:
+      namespace: librenms
+      name: mysql
+      labels:
+        application: librenms
+        component: mysql
+    spec:
+      initContainers:
+      - name: mysql-prepare-volume
+        image: docker.io/tpboudreau/librenms-mysql-prepare-volume:0.1
+        envFrom:
+        - configMapRef:
+            name: mysql
+        volumeMounts:
+        - name: mysql-volume
+          subPath: configuration
+          mountPath: /configuration
+        - name: mysql-volume
+          subPath: database
+          mountPath: /database
+        - name: mysql-volume
+          subPath: initialization
+          mountPath: /initialization
+      containers:
+      - name: mysql
+        image: docker.io/tpboudreau/librenms-mysql:0.1
+        envFrom:
+        - configMapRef:
+            name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: mysql_root_password
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+        volumeMounts:
+        - name: mysql-volume
+          subPath: configuration
+          mountPath: /etc/mysql/conf.d
+        - name: mysql-volume
+          subPath: database
+          mountPath: /var/lib/mysql
+        - name: mysql-volume
+          subPath: initialization
+          mountPath: /docker-entrypoint-initdb.d
+        ports:
+        - name: mysql
+          containerPort: 33306
+          protocol: TCP
+      volumes:
+       - name: mysql-volume
+         emptyDir: {}
+---
+# Source: librenms/charts/librenms-services/templates/redis-ephemeral.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: librenms
+  name: redis
+  labels:
+    application: librenms
+spec:
+  serviceName: redis
+  selector:
+    matchLabels:
+      component: redis
+  replicas: 1
+  template:
+    metadata:
+      namespace: librenms
+      name: redis
+      labels:
+        application: librenms
+        component: redis
+    spec:
+      containers:
+      - name: redis
+        image: docker.io/tpboudreau/librenms-redis:0.1
+        envFrom:
+        - configMapRef:
+            name: redis
+        env:
+        - name: REDIS_REQUIRED_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+        volumeMounts:
+        - name: redis-volume
+          subPath: data
+          mountPath: /data
+        ports:
+        - name: redis
+          containerPort: 36379
+          protocol: TCP
+      volumes:
+      - name: redis-volume
+        emptyDir: {}
+---
+# Source: librenms/charts/librenms-services/templates/rrdcached-ephemeral.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: librenms
+  name: rrdcached
+  labels:
+    application: librenms
+spec:
+  serviceName: rrdcached
+  selector:
+    matchLabels:
+      component: rrdcached
+  replicas: 1
+  template:
+    metadata:
+      namespace: librenms
+      name: rrdcached
+      labels:
+        application: librenms
+        component: rrdcached
+    spec:
+      containers:
+      - name: rrdcached
+        image: docker.io/tpboudreau/librenms-rrdcached:0.1
+        envFrom:
+        - configMapRef:
+            name: rrdcached
+        volumeMounts:
+        - name: rrdcached-volume
+          subPath: data
+          mountPath: /data
+        - name: rrdcached-volume
+          subPath: journal
+          mountPath: /journal
+        ports:
+        - name: rrdcached
+          containerPort: 42217
+          protocol: TCP
+      volumes:
+      - name: rrdcached-volume
+        emptyDir: {}
+---
+# Source: librenms/templates/dispatcher.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: librenms
+  name: dispatcher
+  labels:
+    application: librenms
+spec:
+  serviceName: dispatcher
+  selector:
+    matchLabels:
+      component: dispatcher
+  replicas: 4
+  template:
+    metadata:
+      namespace: librenms
+      name: dispatcher
+      labels:
+        application: librenms
+        component: dispatcher
+    spec:
+      initContainers:      
+      - name: check-mysql
+        image: docker.io/tpboudreau/librenms-check-mysql:0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+      - name: check-rrdcached
+        image: docker.io/tpboudreau/librenms-check-rrdcached:0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: check-memcached
+        image: docker.io/tpboudreau/librenms-check-memcached:0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: application
+      - name: check-redis
+        image: docker.io/tpboudreau/librenms-check-redis:0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: application
+        env:
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+      containers:
+      - name: dispatcher
+        image: docker.io/tpboudreau/librenms-dispatcher:0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: application
+        - configMapRef:
+            name: dispatcher
+        env:
+        - name: LIBRENMS_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_user
+        - name: LIBRENMS_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_mysql_password
+        - name: LIBRENMS_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_redis_password
+        - name: LIBRENMS_APPLICATION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_application_key
+---
+# Source: librenms/templates/cleanup-application.yaml
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  namespace: librenms
+  name: cleanup-application
+spec:
+  schedule: "30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cleanup-application
+            image: docker.io/tpboudreau/librenms-cleanup-application:0.1
+            imagePullPolicy: Always
+            envFrom:
+            - configMapRef:
+                name: application
+            env:
+            - name: LIBRENMS_MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: application
+                  key: librenms_mysql_user
+            - name: LIBRENMS_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: application
+                  key: librenms_mysql_password
+            - name: LIBRENMS_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: application
+                  key: librenms_redis_password
+            - name: LIBRENMS_APPLICATION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: application
+                  key: librenms_application_key
+          restartPolicy: Never
+---
+# Source: librenms/templates/application-ingress.yaml
+apiVersion: networking.k8s.io/v1beta1
+#apiVersion: extensions/v1beta1 
+kind: Ingress
+metadata:
+  namespace: librenms
+  name: application
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: application
+          servicePort: 80
+
+NOTES:
+LibreNMS notes:

@@ -11,7 +11,11 @@ spec:
         spec:
           containers:
           - name: cleanup-application
-            image: docker.io/tpboudreau/librenms-cleanup-application:0.1
+            {{- if .Values.snmpPing }}
+            image: {{ .Values.cleanupApplication.image.repository }}-sping:{{ .Values.cleanupApplication.image.tag }}
+            {{- else }}
+            image: {{ .Values.cleanupApplication.image.repository }}:{{ .Values.cleanupApplication.image.tag }}
+            {{- end }}
             imagePullPolicy: Always
             envFrom:
             - configMapRef:

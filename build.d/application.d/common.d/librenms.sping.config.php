@@ -14,7 +14,7 @@ $config['db_name'] = '${LIBRENMS_MYSQL_DATABASE}';
 $config['db_socket'] = '';
 
 $config['rrd_dir'] = '/opt/librenms/rrd';
-$config['rrdcached'] = '$LIBRENMS_RRDCACHED_HOST:$LIBRENMS_RRDCACHED_PORT';
+$config['rrdcached'] = '${LIBRENMS_RRDCACHED_HOST}:${LIBRENMS_RRDCACHED_PORT}';
 $config['rrdtool_version'] = '1.7.0';
 
 $config['memcached']['enable'] = true;
@@ -22,13 +22,13 @@ $config['memcached']['host'] = '${LIBRENMS_MEMCACHED_HOST}';
 $config['memcached']['port'] = '${LIBRENMS_MEMCACHED_PORT}';
 
 $config['use_snmp_ping'] = true;
-$config['record_snmp_ping_rtt'] = true;
+$config['record_snmp_ping_rtt'] = '${LIBRENMS_SMMP_RTT}';
 $config['snmp_ping_retries'] = 2;
 $config['snmp_ping_timeout'] = 5;
 
 $config['rrdtool'] = '/usr/bin/rrdtool';
-$config['fping'] = '/usr/bin/fping';
-$config['fping6'] = '/usr/bin/fping6';
+$config['fping'] = '/bin/false';
+$config['fping6'] = '/bin/false';
 $config['traceroute']= '/usr/sbin/traceroute';
 $config['traceroute6'] = '/usr/bin/traceroute6';
 $config['snmpwalk'] = '/usr/bin/snmpwalk';

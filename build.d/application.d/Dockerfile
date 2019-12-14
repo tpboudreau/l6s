@@ -1,18 +1,23 @@
 
 ARG MODE
+ARG REPO
+ARG PING
 
 FROM ubuntu:18.04 as base
 
+ARG PING
 ARG TIMEZONE=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TIMEZONE /etc/localtime && echo $TIMEZONE > /etc/timezone
 
-RUN apt-get update && \
-    apt-get install -y software-properties-common && \
+RUN apt-get -qq update && \
+    apt-get -qq install -y software-properties-common && \
     add-apt-repository universe && \
-    DEBIAN_FRONTEND=noninteractive apt-get install tzdata && \
-    apt-get install -y acl composer curl graphviz imagemagick mariadb-client memcached mtr-tiny nmap python-memcache python-mysqldb rrdtool snmp unzip whois && \
-    apt-get install -y pkg-config php7.2-dev zlib1g-dev libmemcached-dev && \
-    apt-get install -y php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-mysqlnd php7.2-snmp php7.2-xml php7.2-zip
+    DEBIAN_FRONTEND=noninteractive apt-get -qq install tzdata && \
+    apt-get -qq install -y acl composer curl graphviz imagemagick mariadb-client memcached mtr-tiny nmap python-memcache python-mysqldb rrdtool snmp unzip whois && \
+    apt-get -qq install -y pkg-config php7.2-dev zlib1g-dev libmemcached-dev && \
+    apt-get -qq install -y php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-mysqlnd php7.2-snmp php7.2-xml php7.2-zip
+
+RUN case ${PING} in 'fping') apt-get install -y fping ;; *) echo "skipping installation of ${PING}" ;; esac
 
 RUN groupadd -g 1010 -r librenms && \
     useradd -c librenms -u 1010 -g 1010 -r -M librenms
@@ -39,14 +44,18 @@ RUN rm /etc/systemd/system/multi-user.target.wants/*.service && \
 
 FROM base as build
 
-RUN apt-get install -y wget && \
+ARG REPO
+
+RUN apt-get -q install -y wget && \
     mkdir -p /opt/librenms && \
     chown librenms:librenms /opt/librenms && \
     chmod 770 /opt/librenms
 
 WORKDIR /opt/librenms
 
-RUN wget -nv -O /tmp/librenms.tar.gz https://github.com/tpboudreau/librenms/tarball/use_snmp_ping && \
+#RUN wget -nv -O /tmp/librenms.tar.gz https://github.com/tpboudreau/librenms/tarball/use_snmp_ping && \
+
+RUN wget -nv -O /tmp/librenms.tar.gz ${REPO} && \
     tar xzf /tmp/librenms.tar.gz --strip-components=1 && \
     chown -R librenms:librenms /opt/librenms && \
     setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/ && \
@@ -54,33 +63,16 @@ RUN wget -nv -O /tmp/librenms.tar.gz https://github.com/tpboudreau/librenms/tarb
 
 RUN su -c '/opt/librenms/scripts/composer_wrapper.php install --no-dev' - librenms
 
-RUN tar czvf /tmp/librenms.tar.gz --acls /opt/librenms
-
-#==============================================================================
-
-FROM build as dispatcher
-
-WORKDIR /opt/librenms
-
-RUN apt-get install -y gettext-base python3-pip && \
-    pip3 install -r requirements.txt
-
-COPY common.d/librenms.env common.d/librenms.config.php common.d/librenms.dispatcher.config.php /tmp/
-RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
-
-COPY dispatcher.d/entrypoint.sh /entrypoint.sh
-COPY common.d/services.sh /services.sh
-
-USER librenms
-
-ENTRYPOINT ["/entrypoint.sh"]
+RUN tar czf /tmp/librenms.tar.gz --acls /opt/librenms
 
 #==============================================================================
 
 FROM ubuntu:18.04 as prepare-volume
 
+ARG PING
+
 RUN apt-get update -y && \
-    apt-get install -y gettext-base 
+    apt-get -q install -y gettext-base 
 
 RUN groupadd -g 1010 -r librenms && \
     useradd -c librenms -u 1010 -g 1010 -r -M librenms && \
@@ -89,7 +81,7 @@ RUN groupadd -g 1010 -r librenms && \
     chmod 770 /opt/librenms
 
 COPY --from=build /tmp/librenms.tar.gz /tmp/
-COPY common.d/librenms.env common.d/librenms.config.php common.d/librenms.dispatcher.config.php /tmp/
+COPY common.d/librenms.env common.d/librenms.${PING}.config.php common.d/librenms.dispatcher.config.php /tmp/
 RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
 
 COPY prepare-volume.d/entrypoint.sh /entrypoint.sh
@@ -107,7 +99,9 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 FROM build as prepare-mysql
 
-COPY common.d/librenms.env common.d/librenms.config.php common.d/librenms.dispatcher.config.php /tmp/
+ARG PING
+
+COPY common.d/librenms.env common.d/librenms.${PING}.config.php common.d/librenms.dispatcher.config.php /tmp/
 RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
 
 COPY prepare-mysql.d/entrypoint.sh /entrypoint.sh
@@ -122,9 +116,32 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 #==============================================================================
 
+FROM build as dispatcher
+
+ARG PING
+
+WORKDIR /opt/librenms
+
+RUN apt-get -q install -y gettext-base python3-pip && \
+    pip3 install -r requirements.txt
+
+COPY common.d/librenms.env common.d/librenms.${PING}.config.php common.d/librenms.dispatcher.config.php /tmp/
+RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
+
+COPY dispatcher.d/entrypoint.sh /entrypoint.sh
+COPY common.d/services.sh /services.sh
+
+USER librenms
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+#==============================================================================
+
 FROM build as cleanup-application
 
-COPY common.d/librenms.env common.d/librenms.config.php common.d/librenms.dispatcher.config.php /tmp/
+ARG PING
+
+COPY common.d/librenms.env common.d/librenms.${PING}.config.php common.d/librenms.dispatcher.config.php /tmp/
 RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
 
 COPY cleanup-application.d/entrypoint.sh /entrypoint.sh
@@ -141,7 +158,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 FROM build as check-mysql
 
 RUN apt-get update -y && \
-    apt-get install -y gettext-base python-pip && \
+    apt-get -q install -y gettext-base python-pip && \
     pip install mysql-connector
 
 COPY check-mysql.d/entrypoint.sh /entrypoint.sh
@@ -184,7 +201,7 @@ FROM application-php-fpm as validate-application
 
 USER root
 
-RUN apt-get install -y git
+RUN apt-get -q install -y git
 
 USER librenms
 
