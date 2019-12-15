@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1beta1
 #apiVersion: extensions/v1beta1 
 kind: Ingress
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: application
   annotations:
     kubernetes.io/ingress.class: "nginx"
@@ -19,7 +19,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: application
 spec:
   type: NodePort
@@ -33,7 +33,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: application
   labels:
     application: librenms
@@ -44,7 +44,7 @@ spec:
       component: application
   template:
     metadata:
-      namespace: {{ .Values.Namespace }}
+      namespace: {{ .Release.Namespace }}
       name: application
       labels:
         application: librenms
@@ -52,7 +52,7 @@ spec:
     spec:
       initContainers:
       - name: application-prepare-volume
-        {{- if .Values.snmpPing }}
+        {{- if .Values.snmpPing.enabled }}
         image: {{ .Values.Application.prepareVolumeImage.repository }}-sping:{{ .Values.Application.prepareVolumeImage.tag }}
         {{- else }}
         image: {{ .Values.Application.prepareVolumeImage.repository }}:{{ .Values.Application.prepareVolumeImage.tag }}
@@ -88,7 +88,7 @@ spec:
       {{- include "librenms.checks" . | indent 6 }}
       containers:
       - name: application-php-fpm
-        {{- if .Values.snmpPing }}
+        {{- if .Values.snmpPing.enabled }}
         image: {{ .Values.Application.phpImage.repository }}-sping:{{ .Values.Application.phpImage.tag }}
         {{- else }}
         image: {{ .Values.Application.phpImage.repository }}:{{ .Values.Application.phpImage.tag }}
@@ -103,11 +103,7 @@ spec:
         - name: application-socket
           mountPath: /sock
       - name: application-nginx
-        {{- if .Values.snmpPing }}
-        image: {{ .Values.Application.nginxImage.repository }}-sping:{{ .Values.Application.nginxImage.tag }}
-        {{- else }}
         image: {{ .Values.Application.nginxImage.repository }}:{{ .Values.Application.nginxImage.tag }}
-        {{- end }}
         imagePullPolicy: Always
         envFrom:
         - configMapRef:

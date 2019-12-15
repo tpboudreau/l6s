@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: prepare-database
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -12,15 +12,20 @@ spec:
   ttlSecondsAfterFinished: 300
   template:
     metadata:
-      namespace: {{ .Values.Namespace }}
+      namespace: {{ .Release.Namespace }}
       name: prepare-database
       labels:
         application: librenms
         component: install
     spec:
+      initContainers:
+      - name: readiness-delay
+        image: busybox:latest
+        command: ['sh', '-c', "sleep {{ .Values.mysql.readinessDelay }}"]
       containers:
       - name: prepare-database
         image: {{ .Values.mysql.prepareDatabaseImage.repository }}:{{ .Values.mysql.prepareDatabaseImage.tag }}
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: application

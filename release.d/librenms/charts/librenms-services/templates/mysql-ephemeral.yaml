@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: mysql
 spec:
   {{- if .Values.mysql.external.enabled }}
@@ -11,7 +11,7 @@ spec:
   - name: mysql
     protocol: TCP
     port: {{ .Values.mysql.servicePort }}
-    targetPort: {{ required "the external MySQL database port must be provided (mysql.external.port)" .Values.mysql.external.port }}
+    targetPort: {{ .Values.mysql.external.port }}
   {{- else }}
   type: ClusterIP
   selector:
@@ -27,19 +27,19 @@ spec:
 kind: Endpoints
 apiVersion: v1
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: mysql
 subsets:
 - addresses:
   - ip: {{ required "the external MySQL database address must be provided (mysql.external.address)" .Values.mysql.external.address }}
   ports:
   - name: mysql
-    port: {{ required "the external MySQL database port must be provided (mysql.external.port)" .Values.mysql.external.port }}
+    port: {{ .Values.mysql.external.port }}
 {{- else }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: mysql
   labels:
     application: librenms
@@ -51,7 +51,7 @@ spec:
   replicas: 1
   template:
     metadata:
-      namespace: {{ .Values.Namespace }}
+      namespace: {{ .Release.Namespace }}
       name: mysql
       labels:
         application: librenms

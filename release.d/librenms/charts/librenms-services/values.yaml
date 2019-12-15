@@ -1,9 +1,8 @@
 
-Namespace: "librenms"
-
 mysql:
   servicePort: 3306
   providerPort: 33306
+  readinessDelay: 10
   image:
     repository: "docker.io/tpboudreau/librenms-mysql"
     tag: "0.1"
@@ -16,7 +15,7 @@ mysql:
   external:
     enabled: false
     #address: "12.34.56.78"
-    #port: 33306
+    port: 3306
 
 rrdcached:
   servicePort: 42217
@@ -33,7 +32,7 @@ rrdcached:
   external:
     enabled: false
     #address: "12.34.56.78"
-    #port: 42217
+    port: 42217
 
 memcached:
   servicePort: 11211

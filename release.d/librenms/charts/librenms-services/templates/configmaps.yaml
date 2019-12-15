@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: mysql
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -15,7 +15,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: rrdcached
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -33,7 +33,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: memcached
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -48,7 +48,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: redis
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"

@@ -7,7 +7,7 @@ for PING in 'fping' 'sping';
 do
   case ${PING} in 'sping') export SUFFIX='-sping' ;; *) export SUFFIX='' ;; esac
   # Appllcation pod images
-  docker build --build-arg MODE=prepare-volume --build-arg REPO=${REPO} --build-arg PING=${PING} -t tpboudreau/librenms-prepare-volume${SUFFIX}:${TAG} .
+  docker build --build-arg MODE=prepare-volume --build-arg REPO=${REPO} --build-arg PING=${PING} -t tpboudreau/librenms-application-prepare-volume${SUFFIX}:${TAG} .
   docker build --build-arg MODE=application-php-fpm --build-arg REPO=${REPO} --build-arg PING=${PING} -t tpboudreau/librenms-application-php-fpm${SUFFIX}:${TAG} .
   docker build --build-arg MODE=check-mysql --build-arg REPO=${REPO} --build-arg PING=sping -t tpboudreau/librenms-check-mysql:${TAG} .
   # Job pod images

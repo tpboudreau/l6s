@@ -53,8 +53,6 @@ RUN apt-get -q install -y wget && \
 
 WORKDIR /opt/librenms
 
-#RUN wget -nv -O /tmp/librenms.tar.gz https://github.com/tpboudreau/librenms/tarball/use_snmp_ping && \
-
 RUN wget -nv -O /tmp/librenms.tar.gz ${REPO} && \
     tar xzf /tmp/librenms.tar.gz --strip-components=1 && \
     chown -R librenms:librenms /opt/librenms && \
@@ -81,7 +79,9 @@ RUN groupadd -g 1010 -r librenms && \
     chmod 770 /opt/librenms
 
 COPY --from=build /tmp/librenms.tar.gz /tmp/
-COPY common.d/librenms.env common.d/librenms.${PING}.config.php common.d/librenms.dispatcher.config.php /tmp/
+COPY common.d/librenms.${PING}.config.php /tmp/librenms.config.php
+COPY common.d/librenms.env /tmp/librenms.env
+COPY common.d/librenms.dispatcher.config.php /tmp/librenms.dispatcher.config.php
 RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
 
 COPY prepare-volume.d/entrypoint.sh /entrypoint.sh
@@ -101,7 +101,9 @@ FROM build as prepare-mysql
 
 ARG PING
 
-COPY common.d/librenms.env common.d/librenms.${PING}.config.php common.d/librenms.dispatcher.config.php /tmp/
+COPY common.d/librenms.${PING}.config.php /tmp/librenms.config.php
+COPY common.d/librenms.env /tmp/librenms.env
+COPY common.d/librenms.dispatcher.config.php /tmp/librenms.dispatcher.config.php
 RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
 
 COPY prepare-mysql.d/entrypoint.sh /entrypoint.sh
@@ -125,7 +127,9 @@ WORKDIR /opt/librenms
 RUN apt-get -q install -y gettext-base python3-pip && \
     pip3 install -r requirements.txt
 
-COPY common.d/librenms.env common.d/librenms.${PING}.config.php common.d/librenms.dispatcher.config.php /tmp/
+COPY common.d/librenms.${PING}.config.php /tmp/librenms.config.php
+COPY common.d/librenms.env /tmp/librenms.env
+COPY common.d/librenms.dispatcher.config.php /tmp/librenms.dispatcher.config.php
 RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
 
 COPY dispatcher.d/entrypoint.sh /entrypoint.sh
@@ -141,7 +145,9 @@ FROM build as cleanup-application
 
 ARG PING
 
-COPY common.d/librenms.env common.d/librenms.${PING}.config.php common.d/librenms.dispatcher.config.php /tmp/
+COPY common.d/librenms.${PING}.config.php /tmp/librenms.config.php
+COPY common.d/librenms.env /tmp/librenms.env
+COPY common.d/librenms.dispatcher.config.php /tmp/librenms.dispatcher.config.php
 RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
 
 COPY cleanup-application.d/entrypoint.sh /entrypoint.sh

@@ -22,7 +22,7 @@ $config['memcached']['host'] = '${LIBRENMS_MEMCACHED_HOST}';
 $config['memcached']['port'] = '${LIBRENMS_MEMCACHED_PORT}';
 
 $config['use_snmp_ping'] = true;
-$config['record_snmp_ping_rtt'] = '${LIBRENMS_SMMP_RTT}';
+$config['record_snmp_ping_rtt'] = ${LIBRENMS_SNMP_RTT};
 $config['snmp_ping_retries'] = 2;
 $config['snmp_ping_timeout'] = 5;
 

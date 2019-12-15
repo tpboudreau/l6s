@@ -1,7 +1,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: cleanup-application
 spec:
   schedule: "30 * * * *"
@@ -11,7 +11,7 @@ spec:
         spec:
           containers:
           - name: cleanup-application
-            {{- if .Values.snmpPing }}
+            {{- if .Values.snmpPing.enabled }}
             image: {{ .Values.cleanupApplication.image.repository }}-sping:{{ .Values.cleanupApplication.image.tag }}
             {{- else }}
             image: {{ .Values.cleanupApplication.image.repository }}:{{ .Values.cleanupApplication.image.tag }}

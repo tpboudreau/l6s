@@ -1,14 +1,9 @@
 
-Namespace: "librenms"
-
-snmpPing: false
-
 Application:
   servicePort: 80
   providerPort: 8000
-  baseURL: "http://138.197.239.217/"
+  baseURL:
   memoryLimit: 1024
-  #snmpRTT: "true"
   prepareVolumeImage:
     repository: "docker.io/tpboudreau/librenms-application-prepare-volume"
     tag: "0.1"
@@ -29,6 +24,10 @@ Dispatcher:
   image:
     repository: "docker.io/tpboudreau/librenms-dispatcher"
     tag: "0.1"
+
+snmpPing:
+  enabled: false
+  recordRTT: true
 
 checkMySQL:
   image:

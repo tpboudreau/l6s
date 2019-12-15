@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: application
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -11,13 +11,15 @@ metadata:
 data:
   LIBRENMS_MYSQL_DATABASE: "librenms"
   LIBRENMS_MEMORY_LIMIT: {{ .Values.Application.memoryLimit | quote }}
-  LIBRENMS_BASE_URL: {{ .Values.Application.baseURL | quote }}
-  LIBRENMS_SNMP_RTT: {{ .Values.Application.snmpRTT | quote }}
+  LIBRENMS_BASE_URL: {{ required "installation base URL must be provided (Application.baseURL)" .Values.Application.baseURL | quote }}
+  {{- if .Values.snmpPing.enabled }}
+  LIBRENMS_SNMP_RTT: {{ .Values.snmpPing.recordRTT | quote }}
+  {{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: dispatcher
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"

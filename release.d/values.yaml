@@ -1,0 +1,17 @@
+
+Application:
+  baseURL: "http://138.197.239.217/"
+
+credentials:
+  application:
+    administrativeUser: "administrator"
+    administrativePassword: "@dministrat0r"
+    administrativeEmail: "administrator@example.org"
+    key: "base64:D+RalEigI7Se33DXWKYUE9ZWOp7iX1/ZSnwkBUL3GyM="
+  mysql:
+    rootPassword: "l!br#nm%"
+    user: "librenms"
+    password: "L1br3NM5"
+  redis:
+    password: "R3d1s"
+  

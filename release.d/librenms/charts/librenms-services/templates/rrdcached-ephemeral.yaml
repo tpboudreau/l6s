@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: rrdcached
 spec:
   {{- if .Values.rrdcached.external.enabled }}
@@ -11,7 +11,7 @@ spec:
   - name: rrdcached
     protocol: TCP
     port: {{ .Values.rrdcached.servicePort }}
-    targetPort: {{ required "the external rrdcached server port must be provided (rrdcached.external.port)" .Values.rrdcached.external.port }}
+    targetPort: {{ .Values.rrdcached.external.port }}
   {{- else }}
   type: ClusterIP
   selector:
@@ -27,19 +27,19 @@ spec:
 kind: Endpoints
 apiVersion: v1
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: rrdcached
 subsets:
 - addresses:
   - ip: {{ required "the external rrdcached server address must be provided (rrdcached.external.address)" .Values.rrdcached.external.address }}
   ports:
   - name: rrdcached
-    port: {{ required "the external rrdcached server port must be provided (rrdcached.external.port)" .Values.rrdcached.external.port }}
+    port: {{ .Values.rrdcached.external.port }}
 {{- else }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  namespace: {{ .Values.Namespace }}
+  namespace: {{ .Release.Namespace }}
   name: rrdcached
   labels:
     application: librenms
@@ -51,7 +51,7 @@ spec:
   replicas: 1
   template:
     metadata:
-      namespace: {{ .Values.Namespace }}
+      namespace: {{ .Release.Namespace }}
       name: rrdcached
       labels:
         application: librenms
