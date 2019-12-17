@@ -1,6 +1,4 @@
 
-Namespace: "librenms"
-
 image:
   repositoryRoot: "docker.io/tpboudreau/librenms-device"
   tag: "0.1"
@@ -10,16 +8,16 @@ Devices:
   SNMPVersion: "v2c"
 - DeviceName: "test-device-one"
   SNMPVersion: "v2c"
-#- DeviceName: "test-device-two"
-#  SNMPVersion: "v2c"
-#- DeviceName: "test-device-three"
-#  SNMPVersion: "v2c"
+- DeviceName: "test-device-two"
+  SNMPVersion: "v2c"
+- DeviceName: "test-device-three"
+  SNMPVersion: "v2c"
 - DeviceName: "test-device-alpha"
   SNMPVersion: "v3"
 - DeviceName: "test-device-beta"
   SNMPVersion: "v3"
-#- DeviceName: "test-device-gamma"
-#  SNMPVersion: "v3"
-#- DeviceName: "test-device-delta"
-#  SNMPVersion: "v3"
+- DeviceName: "test-device-gamma"
+  SNMPVersion: "v3"
+- DeviceName: "test-device-delta"
+  SNMPVersion: "v3"
 

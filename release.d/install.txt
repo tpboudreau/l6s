@@ -1,0 +1,89 @@
+
+For temporary databases:
+
+kubectl create namespace librenms-temporary
+
+helm install \
+  --generate-name \
+  --values values.yaml \
+  --namespace librenms-temporary \
+  --set librenmsServices.mysql.storage.type=temporary \
+  --set librenmsServices.rrdcached.storage.type=temporary \
+  --set librenmsServices.redis.storage.type=temporary \
+  librenms
+   
+helm list --namespace librenms-temporary
+
+...
+
+helm uninstall librenms-$RELEASE_ID --namespace librenms-temporary
+
+kubectl delete namespace librenms-temporary
+
+----------------------------------------------------------------------------------------------------------------
+
+For databases backed by pre-configured persistent volume claims (the default):
+
+kubectl create namespace librenms
+
+helm install \
+  --generate-name \
+  --values values.yaml \
+  --namespace librenms \
+  --set librenmsServices.mysql.storage.claimName=$MYSQL_PVC_NAME \
+  --set librenmsServices.rrdcached.storage.claimName=$RRDCACHED_PVC_NAME \
+  --set librenmsServices.redis.storage.claimName=$REDIS_PVC_NAME \
+  librenms
+
+helm list --namespace librenms
+
+...
+
+helm uninstall $GENERATED_NAME --namespace librenms
+
+kubectl delete namespace librenms
+
+----------------------------------------------------------------------------------------------------------------
+
+For databases running outside the Kubernetes cluster ...
+
+kubectl create namespace librenms
+
+helm install \
+  --generate-name \
+  --values values.yaml \
+  --namespace librenms \
+  --set librenmsServices.mysql.external.enabled=true,librenmsServices.mysql.external.address=$MYSQL_IP_ADDRESS,librenmsServices.mysql.external.port=$MYSQL_PORT \
+  --set librenmsServices.rrdcached.external.enabled=true,librenmsServices.rrdcached.external.address=$RRDCACHED_IP_ADDRESS,librenmsServices.rrdcached.external.port=$RRDCACHED_PORT \
+  --dry-run \
+  librenms
+
+helm list --namespace librenms
+
+...
+
+helm uninstall $GENERATED_NAME --namespace librenms
+
+kubectl delete namespace librenms
+
+----------------------------------------------------------------------------------------------------------------
+
+For running the application in a Kubernetes cluster that forbids setuid / set-cap binaries ...
+
+kubectl create namespace librenms
+
+helm install \
+  --generate-name \
+  --values values.yaml \
+  --namespace librenms \
+  --set snmpPing.enabled=true \
+  librenms
+
+helm list --namespace librenms
+
+...
+
+helm uninstall $GENERATED_NAME --namespace librenms
+
+kubectl delete namespace librenms
+

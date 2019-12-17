@@ -55,4 +55,9 @@ spec:
           protocol: TCP
       volumes:
       - name: redis-volume
+        {{- if eq .Values.redis.storage.type "temporary" }}
         emptyDir: {}
+        {{- else }}
+        persistentVolumeClaim:
+          claimName: {{ required "the name of the pre-configured Redis persistent volume claim must be provided (librenmsServices.redis.storage.claimName)" .Values.redis.storage.claimName }}
+        {{- end }}

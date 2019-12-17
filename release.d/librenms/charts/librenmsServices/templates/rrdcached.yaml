@@ -31,7 +31,7 @@ metadata:
   name: rrdcached
 subsets:
 - addresses:
-  - ip: {{ required "the external rrdcached server address must be provided (rrdcached.external.address)" .Values.rrdcached.external.address }}
+  - ip: {{ required "the external RRDCached server address must be provided (librenmsServices.rrdcached.external.address)" .Values.rrdcached.external.address }}
   ports:
   - name: rrdcached
     port: {{ .Values.rrdcached.external.port }}
@@ -76,5 +76,10 @@ spec:
           protocol: TCP
       volumes:
       - name: rrdcached-volume
+        {{- if eq .Values.rrdcached.storage.type "temporary" }}
         emptyDir: {}
+        {{- else }}
+        persistentVolumeClaim:
+          claimName: {{ required "the name of the pre-configured RRDCached persistent volume claim must be provided (librenmsServices.rrdcached.storage.claimName)" .Values.rrdcached.storage.claimName }}
+        {{- end }}
 {{- end }}

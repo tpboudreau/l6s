@@ -1,7 +1,7 @@
 {{- define "librenms.checks" }}
 - name: check-mysql
   image: {{ .Values.checkMySQL.image.repository }}:{{ .Values.checkMySQL.image.tag }}
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   envFrom:
   - configMapRef:
       name: application
@@ -18,19 +18,19 @@
         key: librenms_mysql_password
 - name: check-rrdcached
   image: {{ .Values.checkRRDcached.image.repository }}:{{ .Values.checkRRDcached.image.tag }}
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   envFrom:
   - configMapRef:
       name: application
 - name: check-memcached
   image: {{ .Values.checkMemcached.image.repository }}:{{ .Values.checkMemcached.image.tag }}
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   envFrom:
   - configMapRef:
       name: application
 - name: check-redis
   image: {{ .Values.checkRedis.image.repository }}:{{ .Values.checkRedis.image.tag }}
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   envFrom:
   - configMapRef:
       name: application

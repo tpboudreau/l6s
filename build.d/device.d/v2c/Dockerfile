@@ -8,8 +8,7 @@ RUN apk update && \
 COPY snmpd.conf.template .
 
 #RUN COMMUNITY=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 16) envsubst < snmpd.conf.template > /tmp/snmpd.conf && \
-
-RUN COMMUNITY=librenmsdevice envsubst < snmpd.conf.template > /tmp/snmpd.conf && \
+RUN COMMUNITY=librenmsDevice envsubst < snmpd.conf.template > /tmp/snmpd.conf && \
     curl -o /tmp/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
 
 #===============================================================================

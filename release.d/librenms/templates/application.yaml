@@ -1,3 +1,4 @@
+{{- if eq .Values.Application.serviceType "ingress" }}
 apiVersion: networking.k8s.io/v1beta1
 #apiVersion: extensions/v1beta1 
 kind: Ingress
@@ -30,6 +31,40 @@ spec:
     port: {{ .Values.Application.servicePort }}
     targetPort: application
 ---
+{{- else if eq .Values.Application.serviceType "loadBalancer" }}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: application
+spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  externalTrafficPolicy: Local
+  selector:
+    component: application
+  ports:
+  - name: application
+    port: {{ .Values.Application.servicePort }}
+    targetPort: application
+---
+{{- else }}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: application
+spec:
+  type: ClusterIP
+  selector:
+    component: application
+  ports:
+  - name: application
+    port: {{ .Values.Application.servicePort }}
+    targetPort: application
+---
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -104,7 +139,7 @@ spec:
           mountPath: /sock
       - name: application-nginx
         image: {{ .Values.Application.nginxImage.repository }}:{{ .Values.Application.nginxImage.tag }}
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
             name: application

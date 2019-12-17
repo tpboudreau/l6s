@@ -31,7 +31,7 @@ metadata:
   name: mysql
 subsets:
 - addresses:
-  - ip: {{ required "the external MySQL database address must be provided (mysql.external.address)" .Values.mysql.external.address }}
+  - ip: {{ required "the external MySQL database address must be provided (librenmsServices.mysql.external.address)" .Values.mysql.external.address }}
   ports:
   - name: mysql
     port: {{ .Values.mysql.external.port }}
@@ -110,6 +110,11 @@ spec:
           containerPort: {{ .Values.mysql.providerPort }}
           protocol: TCP
       volumes:
-       - name: mysql-volume
-         emptyDir: {}
+      - name: mysql-volume
+        {{- if eq .Values.mysql.storage.type "temporary" }}
+        emptyDir: {}
+        {{- else }}
+        persistentVolumeClaim:
+          claimName: {{ required "the name of the pre-configured MySQL persistent volume claim must be provided (librenmsServices.mysql.storage.claimName)" .Values.mysql.storage.claimName }}
+        {{- end }}
 {{- end }}

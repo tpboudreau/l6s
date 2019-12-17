@@ -12,9 +12,11 @@ mysql:
   prepareDatabaseImage:
     repository: "docker.io/tpboudreau/librenms-prepare-mysql"
     tag: "0.1"
+  storage:
+    type: persistent
   external:
     enabled: false
-    #address: "12.34.56.78"
+    address:
     port: 3306
 
 rrdcached:
@@ -29,9 +31,11 @@ rrdcached:
   image:
     repository: "docker.io/tpboudreau/librenms-rrdcached"
     tag: "0.1"
+  storage:
+    type: persistent
   external:
     enabled: false
-    #address: "12.34.56.78"
+    address:
     port: 42217
 
 memcached:
@@ -51,4 +55,6 @@ redis:
   image:
     repository: "docker.io/tpboudreau/librenms-redis"
     tag: "0.1"
+  storage:
+    type: persistent
 

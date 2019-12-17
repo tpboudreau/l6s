@@ -1,6 +1,4 @@
 
-Namespace: "librenms"
-
 image:
   repository: "docker.io/tpboudreau/librenms-console"
   tag: "0.1"

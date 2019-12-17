@@ -1,5 +1,19 @@
 
+credentials:
+  application:
+    administrativeUser:
+    administrativePassword:
+    administrativeEmail:
+    key:
+  mysql:
+    rootPassword:
+    user:
+    password:
+  redis:
+    password:
+  
 Application:
+  serviceType: cluster
   servicePort: 80
   providerPort: 8000
   baseURL:

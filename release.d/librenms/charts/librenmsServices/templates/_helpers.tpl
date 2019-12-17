@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "librenms-services.name" -}}
+{{- define "librenmsServices.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "librenms-services.fullname" -}}
+{{- define "librenmsServices.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -27,16 +27,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "librenms-services.chart" -}}
+{{- define "librenmsServices.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Common labels
 */}}
-{{- define "librenms-services.labels" -}}
-helm.sh/chart: {{ include "librenms-services.chart" . }}
-{{ include "librenms-services.selectorLabels" . }}
+{{- define "librenmsServices.labels" -}}
+helm.sh/chart: {{ include "librenmsServices.chart" . }}
+{{ include "librenmsServices.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -46,17 +46,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "librenms-services.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "librenms-services.name" . }}
+{{- define "librenmsServices.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "librenmsServices.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "librenms-services.serviceAccountName" -}}
+{{- define "librenmsServices.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create -}}
-    {{ default (include "librenms-services.fullname" .) .Values.serviceAccount.name }}
+    {{ default (include "librenmsServices.fullname" .) .Values.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
