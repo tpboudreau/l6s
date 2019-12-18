@@ -9,7 +9,6 @@ do
   # Appllcation pod images
   docker build --build-arg MODE=prepare-volume --build-arg REPO=${REPO} --build-arg PING=${PING} -t tpboudreau/librenms-application-prepare-volume${SUFFIX}:${TAG} .
   docker build --build-arg MODE=application-php-fpm --build-arg REPO=${REPO} --build-arg PING=${PING} -t tpboudreau/librenms-application-php-fpm${SUFFIX}:${TAG} .
-  docker build --build-arg MODE=check-mysql --build-arg REPO=${REPO} --build-arg PING=sping -t tpboudreau/librenms-check-mysql:${TAG} .
   # Job pod images
   docker build --build-arg MODE=prepare-mysql --build-arg REPO=${REPO} --build-arg PING=${PING} -t tpboudreau/librenms-prepare-mysql${SUFFIX}:${TAG} .
   docker build --build-arg MODE=cleanup-application --build-arg REPO=${REPO} --build-arg PING=${PING} -t tpboudreau/librenms-cleanup-application${SUFFIX}:${TAG} .
@@ -19,6 +18,9 @@ do
   # Dispatcher pod images
   docker build --build-arg MODE=dispatcher --build-arg REPO=${REPO} --build-arg PING=${PING} -t tpboudreau/librenms-dispatcher${SUFFIX}:${TAG} .
 done
+
+docker build --build-arg MODE=check-mysql --build-arg REPO=${REPO} --build-arg PING=sping -t tpboudreau/librenms-check-mysql:${TAG} .
+docker build --build-arg MODE=generate-key --build-arg REPO=${REPO} --build-arg PING=sping -t tpboudreau/librenms-generate-key:latest .
 
 cd ./nginx.d && ./build.sh && cd ..
 cd ./check-memcached.d && ./build.sh && cd ..

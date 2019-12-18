@@ -16,6 +16,7 @@ docker push tpboudreau/librenms-application-nginx
 docker push tpboudreau/librenms-prepare-mysql
 docker push tpboudreau/librenms-cleanup-application
 docker push tpboudreau/librenms-validate-application
+docker push tpboudreau/librenms-generate-key
 #docker push tpboudreau/librenms-update-application
 #docker push tpboudreau/librenms-rotate-credentials
 

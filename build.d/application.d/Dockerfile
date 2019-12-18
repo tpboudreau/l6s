@@ -179,6 +179,16 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 #==============================================================================
 
+FROM build as generate-key
+
+WORKDIR /opt/librenms
+
+USER librenms
+
+ENTRYPOINT ["php", "artisan", "key:generate", "--show"]
+
+#==============================================================================
+
 FROM base as application-php-fpm
 
 WORKDIR /opt/librenms

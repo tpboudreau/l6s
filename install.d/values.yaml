@@ -1,5 +1,6 @@
 
 Application:
+  serviceType: ingress
   baseURL: "http://138.197.239.217/"
 
 credentials:
@@ -7,7 +8,6 @@ credentials:
     administrativeUser: "administrator"
     administrativePassword: "@dministrat0r"
     administrativeEmail: "administrator@example.org"
-    key: "base64:D+RalEigI7Se33DXWKYUE9ZWOp7iX1/ZSnwkBUL3GyM="
   mysql:
     rootPassword: "l!br#nm%"
     user: "librenms"
