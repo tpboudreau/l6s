@@ -12,7 +12,7 @@ spec:
   rules:
   - http:
       paths:
-      - path: /
+      - path: {{ .Values.Application.servicePath }}
         backend:
           serviceName: application
           servicePort: {{ .Values.Application.servicePort }}
@@ -49,7 +49,7 @@ spec:
     port: {{ .Values.Application.servicePort }}
     targetPort: application
 ---
-{{- else }}
+{{- else if eq .Values.Application.serviceType "cluster" }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -64,6 +64,7 @@ spec:
     port: {{ .Values.Application.servicePort }}
     targetPort: application
 ---
+{{- else }}
 {{- end }}
 apiVersion: apps/v1
 kind: Deployment
@@ -86,12 +87,8 @@ spec:
         component: application
     spec:
       initContainers:
-      - name: application-prepare-volume
-        {{- if .Values.snmpPing.enabled }}
-        image: {{ .Values.Application.prepareVolumeImage.repository }}-sping:{{ .Values.Application.prepareVolumeImage.tag }}
-        {{- else }}
+      - name: prepare-volume
         image: {{ .Values.Application.prepareVolumeImage.repository }}:{{ .Values.Application.prepareVolumeImage.tag }}
-        {{- end }}
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
@@ -122,12 +119,8 @@ spec:
           mountPath: /opt/librenms
       {{- include "librenms.checks" . | indent 6 }}
       containers:
-      - name: application-php-fpm
-        {{- if .Values.snmpPing.enabled }}
-        image: {{ .Values.Application.phpImage.repository }}-sping:{{ .Values.Application.phpImage.tag }}
-        {{- else }}
+      - name: php-fpm
         image: {{ .Values.Application.phpImage.repository }}:{{ .Values.Application.phpImage.tag }}
-        {{- end }}
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
@@ -137,9 +130,9 @@ spec:
           mountPath: /opt/librenms
         - name: application-socket
           mountPath: /sock
-      - name: application-nginx
+      - name: nginx
         image: {{ .Values.Application.nginxImage.repository }}:{{ .Values.Application.nginxImage.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: application

@@ -21,14 +21,14 @@ $config['memcached']['enable'] = true;
 $config['memcached']['host'] = '${LIBRENMS_MEMCACHED_HOST}';
 $config['memcached']['port'] = '${LIBRENMS_MEMCACHED_PORT}';
 
-$config['use_snmp_ping'] = true;
-$config['record_snmp_ping_rtt'] = ${LIBRENMS_SNMP_RTT};
+$config['use_snmp_ping'] = ${LIBRENMS_SNMP_PING};
+$config['record_snmp_ping_rtt'] = ${LIBRENMS_SNMP_PING_RTT};
 $config['snmp_ping_retries'] = 2;
 $config['snmp_ping_timeout'] = 5;
 
 $config['rrdtool'] = '/usr/bin/rrdtool';
-$config['fping'] = '/bin/false';
-$config['fping6'] = '/bin/false';
+$config['fping'] = '/usr/bin/fping';
+$config['fping6'] = '/usr/bin/fping6';
 $config['traceroute']= '/usr/sbin/traceroute';
 $config['traceroute6'] = '/usr/bin/traceroute6';
 $config['snmpwalk'] = '/usr/bin/snmpwalk';

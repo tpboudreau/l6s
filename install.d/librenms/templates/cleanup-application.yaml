@@ -11,11 +11,7 @@ spec:
         spec:
           containers:
           - name: cleanup-application
-            {{- if .Values.snmpPing.enabled }}
-            image: {{ .Values.cleanupApplication.image.repository }}-sping:{{ .Values.cleanupApplication.image.tag }}
-            {{- else }}
             image: {{ .Values.cleanupApplication.image.repository }}:{{ .Values.cleanupApplication.image.tag }}
-            {{- end }}
             imagePullPolicy: Always
             envFrom:
             - configMapRef:

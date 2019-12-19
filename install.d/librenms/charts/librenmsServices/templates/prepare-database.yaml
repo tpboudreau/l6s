@@ -18,6 +18,9 @@ spec:
         application: librenms
         component: install
     spec:
+      securityContext:
+        runAsUser: 1010
+        runAsGroup: 1010
       initContainers:
       - name: readiness-delay
         image: busybox:latest
@@ -25,7 +28,7 @@ spec:
       containers:
       - name: prepare-database
         image: {{ .Values.mysql.prepareDatabaseImage.repository }}:{{ .Values.mysql.prepareDatabaseImage.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: application
@@ -65,5 +68,5 @@ spec:
             secretKeyRef:
               name: application
               key: librenms_application_key
-      restartPolicy: Never
+      restartPolicy: OnFailure
   backoffLimit: 3

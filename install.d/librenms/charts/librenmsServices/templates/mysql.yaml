@@ -35,7 +35,22 @@ subsets:
   ports:
   - name: mysql
     port: {{ .Values.mysql.external.port }}
+---
 {{- else }}
+{{- if eq .Values.mysql.storage.type "dynamic" }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.mysql.storage.class }}
+  resources:
+    requests:
+      storage: {{ .Values.mysql.storage.size }}
+---
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -58,8 +73,24 @@ spec:
         component: mysql
     spec:
       initContainers:
-      - name: mysql-prepare-volume
+      {{- if and (eq .Values.mysql.storage.type "dynamic") .Values.mysql.storage.subpathRequired }}
+      - name: create-subpath
+        image: {{ .Values.subpath.image.repository }}:{{ .Values.subpath.image.tag }}
+        imagePullPolicy: Always
+        env:
+        - name: SUBPATHS
+          value: "configuration|database|initialization"
+        - name: OWNER
+          value: "999"
+        - name: GROUP
+          value: "999"
+        volumeMounts:
+        - name: mysql-volume
+          mountPath: /volume
+      {{- end }}
+      - name: prepare-volume
         image: {{ .Values.mysql.prepareVolumeImage.repository }}:{{ .Values.mysql.prepareVolumeImage.tag }}
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: mysql
@@ -76,6 +107,7 @@ spec:
       containers:
       - name: mysql
         image: {{ .Values.mysql.image.repository }}:{{ .Values.mysql.image.tag }}
+        imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
             name: mysql
@@ -95,6 +127,10 @@ spec:
             secretKeyRef:
               name: application
               key: librenms_mysql_password
+        ports:
+        - name: mysql
+          containerPort: {{ .Values.mysql.providerPort }}
+          protocol: TCP
         volumeMounts:
         - name: mysql-volume
           subPath: configuration
@@ -105,16 +141,15 @@ spec:
         - name: mysql-volume
           subPath: initialization
           mountPath: /docker-entrypoint-initdb.d
-        ports:
-        - name: mysql
-          containerPort: {{ .Values.mysql.providerPort }}
-          protocol: TCP
       volumes:
       - name: mysql-volume
         {{- if eq .Values.mysql.storage.type "temporary" }}
         emptyDir: {}
-        {{- else }}
+        {{- else if eq .Values.mysql.storage.type "static" }}
         persistentVolumeClaim:
           claimName: {{ required "the name of the pre-configured MySQL persistent volume claim must be provided (librenmsServices.mysql.storage.claimName)" .Values.mysql.storage.claimName }}
+        {{- else }}
+        persistentVolumeClaim:
+          claimName: mysql-volume-claim
         {{- end }}
 {{- end }}

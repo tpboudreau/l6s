@@ -13,7 +13,10 @@ data:
   LIBRENMS_MEMORY_LIMIT: {{ .Values.Application.memoryLimit | quote }}
   LIBRENMS_BASE_URL: {{ required "installation base URL must be provided (Application.baseURL)" .Values.Application.baseURL | quote }}
   {{- if .Values.snmpPing.enabled }}
+  LIBRENMS_SNMP_PING: "true"
   LIBRENMS_SNMP_RTT: {{ .Values.snmpPing.recordRTT | quote }}
+  {{- else }}
+  LIBRENMS_SNMP_PING: "false"
   {{- end }}
 ---
 apiVersion: v1

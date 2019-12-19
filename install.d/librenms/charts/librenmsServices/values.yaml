@@ -13,9 +13,16 @@ mysql:
     repository: "docker.io/tpboudreau/librenms-prepare-mysql"
     tag: "0.1"
   storage:
-    type: persistent
+    type: dynamic
+    # for .storage.type 'dynamic' ...
+    subpathRequired: true
+    class: ssd
+    size: 100Gi
+    # for .storage.type 'static' ...
+    claimName:
   external:
     enabled: false
+    # for .storage.external.enabled true ...
     address:
     port: 3306
 
@@ -32,9 +39,16 @@ rrdcached:
     repository: "docker.io/tpboudreau/librenms-rrdcached"
     tag: "0.1"
   storage:
-    type: persistent
+    type: dynamic
+    # for .storage.type 'dynamic' ...
+    subpathRequired: true
+    class: standard
+    size: 100Gi
+    # for .storage.type 'static' ...
+    claimName:
   external:
     enabled: false
+    # for .storage.external.enabled true ...
     address:
     port: 42217
 
@@ -56,5 +70,16 @@ redis:
     repository: "docker.io/tpboudreau/librenms-redis"
     tag: "0.1"
   storage:
-    type: persistent
+    type: dynamic
+    # for .storage.type 'dynamic' ...
+    subpathRequired: true
+    class: ssd
+    size: 100Gi
+    # for .storage.type 'static' ...
+    claimName:
+
+subpath:
+  image:
+    repository: "docker.io/tpboudreau/librenms-subpath"
+    tag: "0.1"
 

@@ -35,7 +35,22 @@ subsets:
   ports:
   - name: rrdcached
     port: {{ .Values.rrdcached.external.port }}
+---
 {{- else }}
+{{- if eq .Values.rrdcached.storage.type "dynamic" }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rrdcached-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.rrdcached.storage.class }}
+  resources:
+    requests:
+      storage: {{ .Values.rrdcached.storage.size }}
+---
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -57,12 +72,32 @@ spec:
         application: librenms
         component: rrdcached
     spec:
+      {{- if and (eq .Values.rrdcached.storage.type "dynamic") .Values.rrdcached.storage.subpathRequired }}
+      initContainers:
+      - name: create-subpath
+        image: {{ .Values.subpath.image.repository }}:{{ .Values.subpath.image.tag }}
+        imagePullPolicy: Always
+        env:
+        - name: SUBPATHS
+          value: "data|journal"
+        - name: OWNER
+          value: "1010"
+        - name: GROUP
+          value: "1010"
+        volumeMounts:
+        - name: rrdcached-volume
+          mountPath: /volume
+      {{- end }}
       containers:
       - name: rrdcached
         image: {{ .Values.rrdcached.image.repository }}:{{ .Values.rrdcached.image.tag }}
         envFrom:
         - configMapRef:
             name: rrdcached
+        ports:
+        - name: rrdcached
+          containerPort: {{ .Values.rrdcached.providerPort }}
+          protocol: TCP
         volumeMounts:
         - name: rrdcached-volume
           subPath: data
@@ -70,16 +105,15 @@ spec:
         - name: rrdcached-volume
           subPath: journal
           mountPath: /journal
-        ports:
-        - name: rrdcached
-          containerPort: {{ .Values.rrdcached.providerPort }}
-          protocol: TCP
       volumes:
       - name: rrdcached-volume
         {{- if eq .Values.rrdcached.storage.type "temporary" }}
         emptyDir: {}
-        {{- else }}
+        {{- else if eq .Values.rrdcached.storage.type "static" }}
         persistentVolumeClaim:
           claimName: {{ required "the name of the pre-configured RRDCached persistent volume claim must be provided (librenmsServices.rrdcached.storage.claimName)" .Values.rrdcached.storage.claimName }}
+        {{- else }}
+        persistentVolumeClaim:
+          claimName: rrdcached-volume-claim
         {{- end }}
 {{- end }}

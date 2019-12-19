@@ -12,6 +12,20 @@ spec:
     port: {{ .Values.redis.servicePort }}
     targetPort: redis
 ---
+{{- if eq .Values.redis.storage.type "dynamic" }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.redis.storage.class }}
+  resources:
+    requests:
+      storage: {{ .Values.redis.storage.size }}
+---
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -33,9 +47,26 @@ spec:
         application: librenms
         component: redis
     spec:
+      {{- if and (eq .Values.redis.storage.type "dynamic") .Values.redis.storage.subpathRequired }}
+      initContainers:
+      - name: create-subpath
+        image: {{ .Values.subpath.image.repository }}:{{ .Values.subpath.image.tag }}
+        imagePullPolicy: Always
+        env:
+        - name: SUBPATHS
+          value: "data"
+        - name: OWNER
+          value: "999"
+        - name: GROUP
+          value: "1000"
+        volumeMounts:
+        - name: redis-volume
+          mountPath: /volume
+      {{- end }}
       containers:
       - name: redis
         image: {{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}
+        imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
             name: redis
@@ -45,19 +76,22 @@ spec:
             secretKeyRef:
               name: application
               key: librenms_redis_password
-        volumeMounts:
-        - name: redis-volume
-          subPath: data
-          mountPath: /data
         ports:
         - name: redis
           containerPort: {{ .Values.redis.providerPort }}
           protocol: TCP
+        volumeMounts:
+        - name: redis-volume
+          subPath: data
+          mountPath: /data
       volumes:
       - name: redis-volume
         {{- if eq .Values.redis.storage.type "temporary" }}
         emptyDir: {}
-        {{- else }}
+        {{- else if eq .Values.redis.storage.type "static" }}
         persistentVolumeClaim:
           claimName: {{ required "the name of the pre-configured Redis persistent volume claim must be provided (librenmsServices.redis.storage.claimName)" .Values.redis.storage.claimName }}
+        {{- else }}
+        persistentVolumeClaim:
+          claimName: redis-volume-claim
         {{- end }}

@@ -1,6 +1,7 @@
 
 Application:
   serviceType: ingress
+  servicePath: "/"
   baseURL: "http://138.197.239.217/"
 
 credentials:
