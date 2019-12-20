@@ -1,3 +1,4 @@
+{{- if .Release.IsInstall }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -70,3 +71,4 @@ spec:
               key: librenms_application_key
       restartPolicy: OnFailure
   backoffLimit: 3
+{{- end }}
