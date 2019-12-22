@@ -1,5 +1,4 @@
 
-
 # L6S
 
 A flexible Helm 3 chart and supporting resources for deploying [LibreNMS](https://www.librenms.org/ "LibreNMS") on Kubernetes.  If you've got (1) a Kubernetes cluster, (2) kubectl [installed and configured](https://kubernetes.io/docs/tasks/tools/install-kubectl/ "Install and Set Up kubectl") to access your cluster, and (3) helm 3.0 [installed](https://helm.sh/docs/intro/install/ "Installing Helm"), then you're ready to deploy LibreNMS.
@@ -25,7 +24,7 @@ Most deployments require a few common chart variables to be set at installation 
 
 Setting Application.serviceType key to 'ingress' overrides the default service type of 'ClusterIP' for the WebUI and API.  The Application.ingressHost key should be set to a hostname that will resolve to the IP address of your ingress controller's load balancer; the ingress resource installed for LibreNMS will capture all traffic directed to the given hostname.  
 
-An installation comprises four supporting services: a MySQL instance, an RRDCached server, a memcached server, and a Redis instance.  The credentials.mysql.{rootPassword, user, password} and credentials.redis.password keys are used to specify the credentials that you wish to be created for their respective services during installation.  Be sure to change the passwords from the examples given to strong and confidential passwords (See the ***Non-Cluster Databases*** section below for information about the credential.mysql.* keys if you choose to manage your MySQL instance outside the Kubernetes cluster.)
+An installation comprises four supporting services: a MySQL instance, an RRDCached server, a memcached server, and a Redis instance.  The credentials.mysql.{rootPassword, user, password} and credentials.redis.password keys are used to specify the credentials that you wish to be created for their respective services during installation.  Be sure to change the passwords from the examples given to strong and confidential passwords.  (See the ***Non-Cluster Databases*** section below for information about the credential.mysql.* keys if you choose to manage your MySQL instance outside the Kubernetes cluster.)
 
 The credentials.application.* keys are used to specify information about the initial LibreNMS application user that will be created during installation.  This is the user and password you will use to log into the application's WebUI.  Again, be sure to change the example values to suitable values.
 
@@ -36,7 +35,7 @@ Unless otherwise noted, the following sections assume that you have created a va
 To deploy a simple, temporary test installation, just run:
 
     kubectl create namespace librenms
-    helm install librenms \
+    helm install librenms-0.1.0 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -64,7 +63,7 @@ To remove the application from the cluster, find the name generated for the depl
 Production deployments will obviously require persistent storage for the database services.  To dynamically allocate persistent volumes during installation, first create a target namespace, then invoke helm like:
 
     kubectl create namespace librenms
-    helm install librenms \
+    helm install librenms-0.1.0 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -81,11 +80,12 @@ Production deployments will obviously require persistent storage for the databas
       --set librenmsServices.redis.storage.size=50Gi
 
 For each service backed by disk, (1) set the storage.type key to 'dynamic' to indicate that Kubernetes should dynamically allocate persistent volumes (and corresponding persistent volume claims); (2) set the storage.class key to an appropriate storageClass available in your Kubernetes cluster; and (3) set the storage.size key to a value commensurate with the size of the network being monitored.
+
 By default, the job created to prepare the MySQL instance for use by LibreNMS is delayed for 15 seconds, to allow the volumes to be allocated and mounted, and the database to initialize itself and become ready for connections.  This delay can be extended if necessary by setting the librenmsServices.mysql.readinessDelay key to a larger value (in seconds), as shown above.
 
 ##### Static Volumes
 
-Alternatively, persistent volumes for the data services may be created and bound to persistent volume claims in advance.  If you choose this option, you take on the responsibility of making sure that the disks are appropriately sized, correctly formatted and contain the subdirectories (properly owned and/or permissioned) that are expected by the services.  (The actions required to do this differ for each system and cloud provider and are beyond the scope of these instructions.)  The following table shows the expected subdirectories on each volume for each service:
+Alternatively, persistent volumes for any or all of the data services may be created and bound to persistent volume claims in advance.  If you choose this option, you take on the responsibility of making sure that the disks are appropriately sized, correctly formatted and contain the subdirectories (properly owned and/or permissioned) that are expected by the services.  (The actions required to do this differ for each system and cloud provider and are beyond the scope of these instructions.)  The following table shows the expected subdirectories on each volume for each service:
 
 | Service | Subdirectories | Ownership (uid:gid) |
 | ------- | -------------- | ------------------- |
@@ -135,7 +135,7 @@ After creating, formatting, and configuring the disk(s), you must create a Kuber
 
 Be sure to first create the namespace in which the application will be deployed and place the persistent volume claims in that namespace.  After creating the claims, invoke helm like:
 
-    helm install librenms \
+    helm install librenms-0.1.0 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -155,7 +155,7 @@ If you prefer for performance or other operational reasons, you may run either t
 
 ##### MySQL
 
-You may configure your MySQL instance as appropriate for your needs and environment, however, LibreNMS expects a dedicated database schema (conventionally named 'librenms') and a user with full privileges on that database.  At least the following SQL statements (run by a privileged user on your instance) are therefore recommended:
+You may configure your MySQL instance as appropriate for your needs and environment, however, LibreNMS expects a dedicated database schema (conventionally named 'librenms') and a user with full privileges on that database.  Executing at least the following SQL statements (by a privileged user on your instance) is therefore recommended:
 
     CREATE DATABASE librenms;
     ALTER DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
@@ -176,7 +176,7 @@ You may configure and run the rrdcached server as appropriate for your environme
 After instantiating your non-cluster database services, invoke helm like:
 
     kubectl create namespace librenms
-    helm install librenms \
+    helm install librenms-0.1.0 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -194,7 +194,7 @@ Setting the {mysql, rrdcached}.external.enabled key to 'true' indicates to helm 
 
 LibreNMS ordinarily uses fping (or ping) to test via ICMP whether monitored devices are reachable or 'up'.  However, some Kubernetes clusters prohibit the execution of binaries such as fping that require privileged capabilities (such as an enabled setuid bit or Linux privileged networking capabilities).  For deployment in such clusters, you must instruct LibreNMS to "ping" devices using SNMP.  To enable this, invoke helm like:
 
-    helm install librenms \
+    helm install librenms-0.1.0 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -208,7 +208,7 @@ Setting the snmpPing.enabled key to 'true' causes LibreNMS to perform all "pingi
 
 > In the current release, the SNMP ping option is global for and applies to *all* devices monitored by the installation.  In the future, it may be possible to choose fping (ICMP) or snmpstatus (SNMP) testing separately for each device.
 
-Of course you should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
+You should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
 
 ### Non-Ingress Cluster
 
@@ -245,7 +245,7 @@ You may choose any port (spec.ports.port) on which to expose your application, b
 
 After creating the load balancer service, you may deploy the chart.  When invoking helm, you must indicate how your load balancer service can be reached -- either using the IP address assigned to your service or a hostname that is associated with that address -- by supplying the base URL for the application, like:
 
-    helm install librenms \
+    helm install librenms-0.1.0 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -258,13 +258,13 @@ After creating the load balancer service, you may deploy the chart.  When invoki
 
 Replace 'n.n.n.n' with the external IP address of your load balancer.  If you have chosen a port other than 80 (for http:) or 443 (for https:) you should include the port number in your base URL.
 
-Of course you should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
+You should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
 
 ##### ClusterIP Service
 
 Alternatively, to instruct helm to create only a ClusterIP service for LibreNMS, invoke helm like:
 
-    helm install librenms \
+    helm install librenms-0.1.0 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -274,9 +274,9 @@ Alternatively, to instruct helm to create only a ClusterIP service for LibreNMS,
       --set librenmsServices.rrdcached.storage.type=... \
       --set librenmsServices.redis.storage.type=...
 
-Setting the Application.serviceType to 'cluster' will cause Kubernetes to assign to the application service an address drawn from the pool of private addresses reserved for use by your cluster.  Neither this private address nor the cluster-local FQDN created for this service will be directly reachable from outside the cluster.  To access the application you will need to use a DNS server running outside the cluster to route external traffic directed to the application service FQDN into your cluster.  The steps required for this are beyond the scope of this document.
+Setting the Application.serviceType to 'cluster' (also the default) will cause Kubernetes to assign to the application service an address drawn from the pool of private addresses reserved for use by your cluster.  Neither this private address nor the cluster-local FQDN created for this service will be directly reachable from outside the cluster.  To access the application you will need to use a DNS server running outside the cluster to route external traffic directed to the application service FQDN into your cluster.  The steps required for this are beyond the scope of this document.
 
-Of course you should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
+You should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
 
 ### Future Work
 

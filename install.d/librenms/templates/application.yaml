@@ -32,21 +32,6 @@ spec:
     port: {{ .Values.Application.servicePort }}
     targetPort: application
 ---
-{{- else if eq .Values.Application.serviceType "cluster" }}
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: {{ .Release.Namespace }}
-  name: application
-spec:
-  type: ClusterIP
-  selector:
-    component: application
-  ports:
-  - name: application
-    port: {{ .Values.Application.servicePort }}
-    targetPort: application
----
 {{- else if eq .Values.Application.serviceType "loadBalancer" }}
 #apiVersion: v1
 #kind: Service
@@ -66,6 +51,20 @@ spec:
 #    targetPort: application
 #---
 {{- else }}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: application
+spec:
+  type: ClusterIP
+  selector:
+    component: application
+  ports:
+  - name: application
+    port: {{ .Values.Application.servicePort }}
+    targetPort: application
+---
 {{- end }}
 apiVersion: apps/v1
 kind: Deployment
