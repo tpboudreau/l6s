@@ -188,11 +188,11 @@ After instantiating your non-cluster database services, invoke helm like:
       --set librenmsServices.rrdcached.external.address=r.r.r.r \
       --set librenmsServices.rrdcached.external.port=42217
 
-Setting the {mysql, rrdcached}.external.enabled key to 'true' indicates to helm that it should not create pods to run these services during installation.  Instead, the cluster service resources created during installation will direct traffic to the IPv4 external.address and external.port values provided.  (Of course replace 'm.m.m.m' with the IP address of your MySQL server and 'r.r.r.r' with the IP address of your RRDCached server.)  The external.port key is optional: it defaults to 3306 for MySQL and to 42217 for RRDCached.  
+Setting the {mysql, rrdcached}.external.enabled key to 'true' indicates to helm that it should not create pods to run these services during installation.  Instead, the cluster service resources created during installation will direct traffic to the IPv4 external.address and external.port values provided.  (Of course replace 'm.m.m.m' with the IP address of your MySQL server and 'r.r.r.r' with the IP address of your RRDCached server.)  The external.port keys are optional: they default to 3306 for MySQL and 42217 for RRDCached.
 
 ### Non-escalating Executables
 
-LibreNMS ordinarily uses fping (or ping) to test via ICMP whether monitored devices are reachable or 'up'.  However, some Kubernetes clusters prohibit the execution of binaries such as fping that require privileged capabilities (such as a set setuid bit or Linux privileged network capabilities).  For deployment in such clusters, you must instruct LibreNMS to "ping" devices using SNMP.  To enable this, invoke helm like:
+LibreNMS ordinarily uses fping (or ping) to test via ICMP whether monitored devices are reachable or 'up'.  However, some Kubernetes clusters prohibit the execution of binaries such as fping that require privileged capabilities (such as an enabled setuid bit or Linux privileged networking capabilities).  For deployment in such clusters, you must instruct LibreNMS to "ping" devices using SNMP.  To enable this, invoke helm like:
 
     helm install librenms \
       --generate-name \
@@ -206,7 +206,7 @@ LibreNMS ordinarily uses fping (or ping) to test via ICMP whether monitored devi
 
 Setting the snmpPing.enabled key to 'true' causes LibreNMS to perform all "pinging" -- during device addition, discovery, and polling -- using the snmpstatus command rather than fping.
 
-> In the current release, the SNMP ping option applies to *all* devices monitored by the installation.  In the future, it may be possible to choose fping (ICMP) or snmpstatus (SNMP) testing separately for each device.
+> In the current release, the SNMP ping option is global for and applies to *all* devices monitored by the installation.  In the future, it may be possible to choose fping (ICMP) or snmpstatus (SNMP) testing separately for each device.
 
 Of course you should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
 
@@ -214,11 +214,11 @@ Of course you should choose the appropriate storage type for each supporting ser
 
 If your Kubernetes cluster does not support the Nginx Ingress Controller, you must use either a ClusterIP only service or a LoadBalancer service to access your WebUI and API.
 
-> If you have modeled your values.yaml file as recommended above, you may remove all the Application keys (serviceType and ingressHost) when deploying to a non-ingress cluster.
+> If you have modeled your values.yaml file as recommended above, you may remove the Application.serviceType and Application.ingressHost keys when deploying to a non-ingress cluster.
 
 ##### LoadBalancer Service
 
-If your cluster supports LoadBalancer services, you can use one to provide access to the application.  The details for setting configuring a load balancer service differ slightly by cluster provider, but typically you will first create the namespace for the installation:
+If your cluster supports LoadBalancer services, you can use one to provide access to the application.  The details for configuring a load balancer service differ slightly by cluster provider, but typically you will first create the namespace for the installation:
 
     kubectl create namespace librenms
 
@@ -243,7 +243,7 @@ Then you can use the kubectl tool to create a service resource in that namespace
 
 You may choose any port (spec.ports.port) on which to expose your application, but the pod selector label (spec.selector.component) and target port (spec.ports.targetPort) must both be set to 'application'
 
-After creating the load balancer service, you may deploy the chart.  When invoking helm, you must indicate how your load balancer service can be reached -- either by IP address or hostname -- by supplying the base URL for the application, like:
+After creating the load balancer service, you may deploy the chart.  When invoking helm, you must indicate how your load balancer service can be reached -- either using the IP address assigned to your service or a hostname that is associated with that address -- by supplying the base URL for the application, like:
 
     helm install librenms \
       --generate-name \
@@ -282,7 +282,7 @@ Of course you should choose the appropriate storage type for each supporting ser
 
  - Provide support for additional ingress controllers
  - Provide support for TLS ingress termination
- - Implement gateway/ingress to support services for remote dispatchers
+ - Implement gateway/ingress to allow access to support services for remote dispatchers
  - Implement safe upgrades to new versions
  - Implement on-demand or periodic credential rotation job
  - Implement on-demand or periodic database backup job(s)
