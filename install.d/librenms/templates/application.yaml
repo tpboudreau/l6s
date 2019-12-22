@@ -6,13 +6,14 @@ metadata:
   namespace: {{ .Release.Namespace }}
   name: application
   annotations:
-    kubernetes.io/ingress.class: "nginx"
+    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - http:
+  - host: {{ required "service host name must be provided (Application.serviceHost)" .Values.Application.serviceHost }}
+    http:
       paths:
-      - path: {{ .Values.Application.servicePath }}
+      - path: /
         backend:
           serviceName: application
           servicePort: {{ .Values.Application.servicePort }}

@@ -1,8 +1,7 @@
 
 Application:
   serviceType: ingress
-  servicePath: "/"
-  baseURL: "http://138.197.239.217/"
+  ingressHost: "librenms.gloucester-r.com"
 
 credentials:
   application:

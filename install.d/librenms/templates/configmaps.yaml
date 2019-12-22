@@ -11,12 +11,13 @@ metadata:
 data:
   LIBRENMS_MYSQL_DATABASE: "librenms"
   LIBRENMS_MEMORY_LIMIT: {{ .Values.Application.memoryLimit | quote }}
-  LIBRENMS_BASE_URL: {{ required "installation base URL must be provided (Application.baseURL)" .Values.Application.baseURL | quote }}
+  LIBRENMS_BASE_URL: {{ cat "http://" .Values.Application.serviceHost .Values.Application.servicePath | nospace | quote }}
   {{- if .Values.snmpPing.enabled }}
   LIBRENMS_SNMP_PING: "true"
-  LIBRENMS_SNMP_RTT: {{ .Values.snmpPing.recordRTT | quote }}
+  LIBRENMS_SNMP_PING_RTT: {{ .Values.snmpPing.recordRTT | quote }}
   {{- else }}
   LIBRENMS_SNMP_PING: "false"
+  LIBRENMS_SNMP_PING_RTT: "false"
   {{- end }}
 ---
 apiVersion: v1

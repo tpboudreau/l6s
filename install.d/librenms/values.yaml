@@ -14,10 +14,10 @@ credentials:
   
 Application:
   serviceType: cluster
-  servicePath: "/"
   servicePort: 80
   providerPort: 8000
-  baseURL:
+  ingressHost:
+  ingressPath: "/"
   memoryLimit: 1024
   prepareVolumeImage:
     repository: "docker.io/tpboudreau/librenms-application-prepare-volume"
