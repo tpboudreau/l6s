@@ -11,7 +11,7 @@ metadata:
 data:
   LIBRENMS_MYSQL_DATABASE: "librenms"
   LIBRENMS_MEMORY_LIMIT: {{ .Values.Application.memoryLimit | quote }}
-  LIBRENMS_BASE_URL: {{ cat "http://" .Values.Application.serviceHost .Values.Application.servicePath | nospace | quote }}
+  LIBRENMS_BASE_URL: {{ coalesce .Values.Application.baseURL ( cat "http://" .Values.Application.ingressHost .Values.Application.ingressPath | nospace ) | quote }}
   {{- if .Values.snmpPing.enabled }}
   LIBRENMS_SNMP_PING: "true"
   LIBRENMS_SNMP_PING_RTT: {{ .Values.snmpPing.recordRTT | quote }}

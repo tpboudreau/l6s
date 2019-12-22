@@ -18,6 +18,7 @@ Application:
   providerPort: 8000
   ingressHost:
   ingressPath: "/"
+  baseURL:
   memoryLimit: 1024
   prepareVolumeImage:
     repository: "docker.io/tpboudreau/librenms-application-prepare-volume"

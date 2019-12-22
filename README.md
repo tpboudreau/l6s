@@ -79,14 +79,16 @@ By default, the job created to prepare the MySQL instance for use by LibreNMS is
 ##### Static Volumes
 Alternatively, persistent volumes for the data services may be created and bound to persistent volume claims in advance.  If you choose this option, you take on the responsibility of making sure that the disks are appropriately sized, correctly formatted and contain the subdirectories (properly owned and/or permissioned) that are expected by the services.  (The actions required to do this differ for each system and cloud provider and are beyond the scope of these instructions.)  The following table shows the expected subdirectories on each volume for each service:
 
-| Service | Subdirectories | Ownership |
-| ------- | -------------- | --------- |
+| Service | Subdirectories | Ownership (uid:gid) |
+| ------- | -------------- | ------------------- |
 | MySQL | /configuration | 999:999 |
 | | /database | 999:999 |
 | | /initialization | 999:999 |
 | RRDCached | /data | 1010:1010 |
 | | /journal | 1010:1010 |
 | Redis | /data | 999:1000 |
+
+As an alternative to changing the ownership, you can set he permission to 0x0777 (read-write-search for all) for each directory.
 
 After creating, formatting, and configuring the disk(s), you must create a Kubernetes persistent volume resource for each disk and bind a corresponding persistent volume claim resource to each persistent volume.  Again, the particulars on creating these resources vary slightly for each Kubernetes cluster, but assuming, for example, a GCE persistent disk named 'l6s-mysql' formatted with the ext4 filesystem, the required resources for a static MySQL volume will resemble:
 
@@ -145,7 +147,7 @@ If you prefer, for performance or other operational reasons, you may run either 
 
 ##### MySQL
 
-You may configure your MySQL instance as appropriate for your environment, however, LibreNMS expects a database schema named 'librenms' and a user with full privileges on that database.  At least the following SQL statements (run by a privileged user) are recommended:
+You may configure your MySQL instance as appropriate for your needs and environment, however, LibreNMS expects a dedicated database schema (conventionally named 'librenms') and a user with full privileges on that database.  At least the following SQL statements (run by a privileged user) are therefore recommended:
 
     CREATE DATABASE librenms;
     ALTER DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
@@ -159,157 +161,120 @@ Make sure that the librenms user password is appropriately secure and confidenti
 
 ##### RRDCached
 
-You may configure and run the rrdcached server as appropriate for your environment.  Be sure to permit recursive access to the base data directory (with the '-R' command line option) as LibreNMS creates one subdirectory per device.
+You may configure and run the rrdcached server as appropriate for your environment.  Be sure to permit recursive access to the base data directory (with the '-R' command line option) as LibreNMS typically creates one subdirectory per device.
 
 ##### Installation
 
-After standing up your non-cluster database service(s), invoke helm like:
+After instantiating your non-cluster database services, invoke helm like:
 
     kubectl create namespace librenms
     helm install librenms \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
+      --set credentials.application.key=$(docker run --rm tpboudreau/librenms-generate-key) \
       --set librenmsServices.mysql.external.enabled=true \
-      --set librenmsServices.mysql.external.address=12.34.56.78 \
+      --set librenmsServices.mysql.external.address=m.m.m.m \
       --set librenmsServices.mysql.external.port=3306 \
       --set librenmsServices.rrdcached.external.enabled=true \
-      --set librenmsServices.rrdcached.external.address=12.34.56.78 \
+      --set librenmsServices.rrdcached.external.address=r.r.r.r \
       --set librenmsServices.rrdcached.external.port=42217
 
-Setting the {mysql, rrdcached}.external.enabled key to 'true' indicates to helm that pods for these services should not be created and that the cluster service resources created during installation should point to the IPv4 external.address and external.port values provided.  The external.port key is optional: it defaults to 3306 for MySQL and 42217 for RRDCached.  
+Setting the {mysql, rrdcached}.external.enabled key to 'true' indicates to helm that it should not create pods to run these services during installation.  Instead, the cluster service resources created during installation will direct traffic to the IPv4 external.address and external.port values provided.  The external.port key is optional: it defaults to 3306 for MySQL and to 42217 for RRDCached.  
 
+### Non-escalating Executables
 
+LibreNMS ordinarily uses fping (or ping) to test via ICMP whether monitored devices are reachable or 'up'.  However, some Kubernetes clusters prohibit the execution of binaries such as fping that require privileged capabilities (such as a set setuid bit or Linux privileged network capabilities).  For deployment in such clusters, you must instruct LibreNMS to "ping" devices using SNMP.  To enable this, invoke helm like:
 
+    helm install librenms \
+      --generate-name \
+      --values values.yaml \
+      --namespace librenms \
+      --set snmpPing.enabled=true \
+      --set credentials.application.key=... \
+      --set librenmsServices.mysql.storage.type=... \
+      --set librenmsServices.rrdcached.storage.type=... \
+      --set librenmsServices.redis.storage.type=...
 
+Setting the snmpPing.enabled key to 'true' causes LibreNMS to perform all "pinging" -- during device addition, discovery, and polling -- using the snmpstatus command rather than fping.
 
+> In the current release, the SNMP ping option applies to *all* devices monitored by the installation.  In the future, it may be possible to choose fping (ICMP) or snmpstatus (SNMP) testing separately for each device.
 
+Of course you should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
 
-# l6s
+### Non-Ingress Cluster
 
-WIP LibreNMS k8s+helm
+If your Kubernetes cluster does not support the Nginx Ingress Controller, you must use either a ClusterIP only service or a LoadBalancer service to access your WebUI and API.
 
-Options for database instances (mysql and rrdcached):
+> If you have modeled your values.yaml file as recommended above, you may remove all the Application keys (serviceType and ingressHost) when deploying to a non-ingress cluster.
 
-- cluster (typical clusterip service created; pods are created to run mysql and rrdcached) [default]
-  - with ephemeral storage (for tire-kicking)
-  - with pre-provisioned persistent storage (for the OG)
-  - with dynamically provisioned persistent storage [default]
+##### LoadBalancer Service
 
-- external (non-selecting clusterip service created + endpoints routing to provided address:port) [GR]
+If your cluster supports LoadBalancer services, you can use one to provide access to the application.  The details for setting configuring a load balancer service differ slightly by cluster provider, but typically you will first create the namespace for the installation:
 
-Options for application service (for webUI/API):
+    kubectl create namespace librenms
 
-- clusterip only (external DNS routing to cluster) [default]
-- loadbalancer (http only (maybe later https) + nginx whitelist acl; useful for cloud k8s installations)
-- ingress (with NodePoint cluster service; ingress load balancer handles SSL termination) [GR]
+Then you can use the kubectl tool to create a service resource in that namespace using YAML that is something like:
 
-Options for database services (for dispatchers):
+    apiVersion: v1
+    kind: Service
+    metadata:
+      namespace: librenms
+      name: application
+    spec:
+      type: LoadBalancer
+      loadBalancerSourceRanges:
+      - 0.0.0.0/0
+      externalTrafficPolicy: Local
+      selector:
+        component: application
+      ports:
+      - name: application
+        port: 80
+        targetPort: application
 
-- clusterip(s) only (valid if no remote pollers/dispatchers, or if external DNS routing per service) [default] [GR]
-- one loadbalancer per service (dangerous without ACLs anywhere in route; some cloud providers support source IP restrictions)
-- one load balancer for all services (requires lightweight static gateway proxy to route and enforce ACLs -- proxy protocol would be ideal, but requires controllers in pods)
-- ingress(es) (provided TCP routing is supported to route and enforce ACLs -- proxy protocol would be ideal, but requires controllers in pods)
+You may choose any port (spec.ports.port) on which to expose your application, but the pod selector label (spec.selector.component) and target port (spec.ports.targetPort) must both be set to 'application'
 
-Options for credential rotation:
+After creating the load balancer service, you may deploy the chart.  When invoking helm, you must indicate how your load balancer service can be reached -- either by IP address or hostname -- by supplying the base URL for the application, like:
 
-- never
-- on-demand [default]
-- periodic
+    helm install librenms \
+      --generate-name \
+      --values values.yaml \
+      --namespace librenms \
+      --set credentials.application.key=$(docker run --rm tpboudreau/librenms-generate-key) \
+      --set Application.serviceType=loadBalancer \
+      --set Application.baseURL='http://n.n.n.n/' \
+      --set librenmsServices.mysql.storage.type=temporary \
+      --set librenmsServices.rrdcached.storage.type=temporary \
+      --set librenmsServices.redis.storage.type=temporary
 
-Options for application update:
+If you have chosen a port other than 80 (for http:) or 443 (for https:) you should include the port number in your base URL.
 
-- never
-- on-demand [default]
-- periodic
+Of course you should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
 
-------------------------------------
+##### ClusterIP Service
 
-For temporary databases:
+Alternatively, to instruct helm to create only a ClusterIP service for LibreNMS, invoke helm like:
 
-kubectl create namespace librenms-temporary
+    helm install librenms \
+      --generate-name \
+      --values values.yaml \
+      --namespace librenms \
+      --set credentials.application.key=$(docker run --rm tpboudreau/librenms-generate-key) \
+      --set Application.serviceType=cluster \
+      --set librenmsServices.mysql.storage.type=... \
+      --set librenmsServices.rrdcached.storage.type=... \
+      --set librenmsServices.redis.storage.type=...
 
-helm install \
-  --generate-name \
-  --values values.yaml \
-  --namespace librenms-temporary \
-  --set librenmsServices.mysql.storage.type=temporary \
-  --set librenmsServices.rrdcached.storage.type=temporary \
-  --set librenmsServices.redis.storage.type=temporary \
-  librenms
-   
-helm list --namespace librenms-temporary
+Setting the Application.serviceType to 'cluster' will cause Kubernetes to assign to the application service an address drawn from the pool of private addresses reserved for use by your cluster.  Neither this private address nor the cluster-local FQDN created for this service will be directly reachable from outside the cluster.  To access the application you will need to use a DNS server running outside the cluster to route external traffic directed to the application service FQDN into your cluster.  The steps required for this are beyond the scope of this document.
 
-...
+Of course you should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
 
-helm uninstall librenms-$RELEASE_ID --namespace librenms-temporary
+### Future Work
 
-kubectl delete namespace librenms-temporary
-
-----------------------------------------------------------------------------------------------------------------
-
-For databases backed by pre-configured persistent volume claims (the default):
-
-kubectl create namespace librenms
-
-helm install \
-  --generate-name \
-  --values values.yaml \
-  --namespace librenms \
-  --set librenmsServices.mysql.storage.claimName=$MYSQL_PVC_NAME \
-  --set librenmsServices.rrdcached.storage.claimName=$RRDCACHED_PVC_NAME \
-  --set librenmsServices.redis.storage.claimName=$REDIS_PVC_NAME \
-  librenms
-
-helm list --namespace librenms
-
-...
-
-helm uninstall $GENERATED_NAME --namespace librenms
-
-kubectl delete namespace librenms
-
-----------------------------------------------------------------------------------------------------------------
-
-For databases running outside the Kubernetes cluster ...
-
-kubectl create namespace librenms
-
-helm install \
-  --generate-name \
-  --values values.yaml \
-  --namespace librenms \
-  --set librenmsServices.mysql.external.enabled=true,librenmsServices.mysql.external.address=$MYSQL_IP_ADDRESS,librenmsServices.mysql.external.port=$MYSQL_PORT \
-  --set librenmsServices.rrdcached.external.enabled=true,librenmsServices.rrdcached.external.address=$RRDCACHED_IP_ADDRESS,librenmsServices.rrdcached.external.port=$RRDCACHED_PORT \
-  --dry-run \
-  librenms
-
-helm list --namespace librenms
-
-...
-
-helm uninstall $GENERATED_NAME --namespace librenms
-
-kubectl delete namespace librenms
-
-----------------------------------------------------------------------------------------------------------------
-
-For running the application in a Kubernetes cluster that forbids setuid / set-cap binaries ...
-
-kubectl create namespace librenms
-
-helm install \
-  --generate-name \
-  --values values.yaml \
-  --namespace librenms \
-  --set snmpPing.enabled=true \
-  librenms
-
-helm list --namespace librenms
-
-...
-
-helm uninstall $GENERATED_NAME --namespace librenms
-
-kubectl delete namespace librenms
+ - Implement gateway/ingress to support services for remote dispatchers
+ - Provide support for additional ingress controllers
+ - Implement safe upgrades to new versions
+ - Implement on-demand or periodic credential rotation job
+ - Implement on-demand or periodic database backup job(s)
 
