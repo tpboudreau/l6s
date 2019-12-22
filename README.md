@@ -98,7 +98,7 @@ Alternatively, persistent volumes for any or all of the data services may be cre
 
 As an alternative to changing the ownership, you can set the permissions to 0x0777 (read-write-search for all) for each required subdirectory.
 
-After creating, formatting, and configuring the disk(s), you must create a Kubernetes persistent volume resource for each disk and bind a corresponding persistent volume claim resource to each persistent volume.  Again, the particulars on creating these resources vary slightly for each Kubernetes cluster, but assuming, for example, a GCE persistent disk named 'l6s-mysql' formatted with the ext4 filesystem, the required resources for a static MySQL volume will resemble:
+After creating, formatting, and configuring the disks, you must create a Kubernetes persistent volume resource for each disk and bind a corresponding persistent volume claim resource to each persistent volume.  Again, the particulars on creating these resources vary slightly for each Kubernetes cluster, but assuming, for example, a GCE persistent disk named 'l6s-mysql' formatted with the ext4 filesystem, the required resources for a static MySQL volume will resemble:
 
     kind: PersistentVolume
     apiVersion: v1
@@ -147,7 +147,7 @@ Be sure to first create the namespace in which the application will be deployed 
       --set librenmsServices.redis.storage.type=static \
       --set librenmsServices.redis.storage.claimName=redis-volume
 
-Here, the persistent storage for each service is marked 'static' (that is, pre-allocated and configured) and the storage.claimName keys provide the name of the persistent volume claim(s) you manually created earlier.
+Here, the persistent storage for each service is marked 'static' (that is, pre-allocated and configured) and the storage.claimName keys provide the name of the persistent volume claims you manually created earlier.
 
 ### Non-Cluster Databases
 
@@ -206,7 +206,7 @@ LibreNMS ordinarily uses fping (or ping) to test via ICMP whether monitored devi
 
 Setting the snmpPing.enabled key to 'true' causes LibreNMS to perform all "pinging" -- during device addition, discovery, and polling -- using the snmpstatus command rather than fping.
 
-> In the current release, the SNMP ping option is global for and applies to *all* devices monitored by the installation.  In the future, it may be possible to choose fping (ICMP) or snmpstatus (SNMP) testing separately for each device.
+> In the current release, the SNMP ping option is global and applies to *all* devices monitored by the installation.  In the future, it may be possible to choose fping (ICMP) or snmpstatus (SNMP) testing separately for each device.
 
 You should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
 
@@ -241,9 +241,9 @@ Then you can use the kubectl tool to create a service resource in that namespace
         port: 80
         targetPort: application
 
-You may choose any port (spec.ports.port) on which to expose your application, but the pod selector label (spec.selector.component) and target port (spec.ports.targetPort) must both be set to 'application'
+You may choose any port (spec.ports.port) on which to expose your application, but the pod selector label (spec.selector.component) and target port (spec.ports.targetPort) must both be set to 'application'.
 
-After creating the load balancer service, you may deploy the chart.  When invoking helm, you must indicate how your load balancer service can be reached -- either using the IP address assigned to your service or a hostname that is associated with that address -- by supplying the base URL for the application, like:
+After creating the load balancer service, you may deploy the chart.  When invoking helm, you must indicate how your load balancer service can be reached by supplying the base URL for the application -- either using the external IP address assigned to your load balancer service or a hostname associated with that address:
 
     helm install librenms-0.1.0 \
       --generate-name \

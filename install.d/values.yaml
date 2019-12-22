@@ -1,17 +1,17 @@
 
 Application:
   serviceType: ingress
-  ingressHost: "librenms.gloucester-r.com"
+  ingressHost: "librenms.example.com"
 
 credentials:
   application:
-    administrativeUser: "administrator"
-    administrativePassword: "@dministrat0r"
-    administrativeEmail: "administrator@example.org"
+    administrativeUser: "admin"
+    administrativePassword: "adminPassword"
+    administrativeEmail: "admin@example.org"
   mysql:
-    rootPassword: "l!br#nm%"
+    rootPassword: "mysqlRootPassword"
     user: "librenms"
-    password: "L1br3NM5"
+    password: "userPassword"
   redis:
-    password: "R3d1s"
-  
+    password: "redisPassword"
+
