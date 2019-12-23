@@ -186,9 +186,12 @@ After instantiating your non-cluster database services, invoke helm like:
       --set librenmsServices.mysql.external.port=3306 \
       --set librenmsServices.rrdcached.external.enabled=true \
       --set librenmsServices.rrdcached.external.address=r.r.r.r \
-      --set librenmsServices.rrdcached.external.port=42217
+      --set librenmsServices.rrdcached.external.port=42217 \
+      --set librenmsServices.redis.storage.type=...
 
 Setting the {mysql, rrdcached}.external.enabled key to 'true' indicates to helm that it should not create pods to run these services during installation.  Instead, the cluster service resources created during installation will direct traffic to the IPv4 external.address and external.port values provided.  (Of course replace 'm.m.m.m' with the IP address of your MySQL server and 'r.r.r.r' with the IP address of your RRDCached server.)  The external.port keys are optional: they default to 3306 for MySQL and 42217 for RRDCached.
+
+Of course, you will need to choose the appropriate storage type for the Redis service and provide the required supplementary values.
 
 ### Non-escalating Executables
 
@@ -206,7 +209,7 @@ LibreNMS ordinarily uses fping (or ping) to test via ICMP whether monitored devi
 
 Setting the snmpPing.enabled key to 'true' causes LibreNMS to perform all "pinging" -- during device addition, discovery, and polling -- using the snmpstatus command rather than fping.
 
-> In the current release, the SNMP ping option is global and applies to *all* devices monitored by the installation.  In the future, it may be possible to choose fping (ICMP) or snmpstatus (SNMP) testing separately for each device.
+> In the current release, the SNMP ping option is a global configuration parameter and applies to *all* devices monitored by the installation.  In the future, it may be possible to choose fping (ICMP) or snmpstatus (SNMP) testing separately for each device.
 
 You should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
 
@@ -243,7 +246,7 @@ Then you can use the kubectl tool to create a service resource in that namespace
 
 You may choose any port (spec.ports.port) on which to expose your application, but the pod selector label (spec.selector.component) and target port (spec.ports.targetPort) must both be set to 'application'.
 
-After creating the load balancer service, you may deploy the chart.  When invoking helm, you must indicate how your load balancer service can be reached by supplying the base URL for the application -- either using the external IP address assigned to your load balancer service or a hostname associated with that address:
+After creating the load balancer service, you may deploy the chart.  When invoking helm, you must indicate how your load balancer service can be reached by supplying the base URL for the application -- either using the external IP address assigned to your load balancer service when it was created or a hostname associated with that address:
 
     helm install librenms-0.1.0 \
       --generate-name \
@@ -274,7 +277,7 @@ Alternatively, to instruct helm to create only a ClusterIP service for LibreNMS,
       --set librenmsServices.rrdcached.storage.type=... \
       --set librenmsServices.redis.storage.type=...
 
-Setting the Application.serviceType to 'cluster' (also the default) will cause Kubernetes to assign to the application service an address drawn from the pool of private addresses reserved for use by your cluster.  Neither this private address nor the cluster-local FQDN created for this service will be directly reachable from outside the cluster.  To access the application you will need to use a DNS server running outside the cluster to route external traffic directed to the application service FQDN into your cluster.  The steps required for this are beyond the scope of this document.
+Setting the Application.serviceType to 'cluster' (the default) will cause Kubernetes to assign to the application service an address drawn from the pool of private addresses reserved for use by your cluster.  Neither this private address nor the cluster-local FQDN created for this service will be directly reachable from outside the cluster.  To access the application you will need to use a DNS server running outside the cluster to route external traffic directed to the application service FQDN into your cluster.  The steps required for this are beyond the scope of this document.
 
 You should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
 
