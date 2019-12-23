@@ -22,7 +22,7 @@ Most deployments require a few common chart variables to be set at installation 
       redis:
         password: "redisPassword"
 
-Setting Application.serviceType key to 'ingress' overrides the default service type of 'ClusterIP' for the WebUI and API.  The Application.ingressHost key should be set to a hostname that will resolve to the IP address of your ingress controller's load balancer; the ingress resource installed for LibreNMS will capture all traffic directed to the given hostname.  
+Setting the Application.serviceType key to 'ingress' overrides the default service type of 'ClusterIP' for the WebUI and API.  The Application.ingressHost key should be set to a hostname that will resolve to the IP address of your ingress controller's load balancer; the ingress resource installed for LibreNMS will capture all traffic directed to the given hostname.  
 
 An installation comprises four supporting services: a MySQL instance, an RRDCached server, a memcached server, and a Redis instance.  The credentials.mysql.{rootPassword, user, password} and credentials.redis.password keys are used to specify the credentials that you wish to be created for their respective services during installation.  Be sure to change the passwords from the examples given to strong and confidential passwords.  (See the ***Non-Cluster Databases*** section below for information about the credential.mysql.* keys if you choose to manage your MySQL instance outside the Kubernetes cluster.)
 
@@ -96,7 +96,7 @@ Alternatively, persistent volumes for any or all of the data services may be cre
 | | /journal | 1010:1010 |
 | Redis | /data | 999:1000 |
 
-As an alternative to changing the ownership, you can set the permissions to 0x0777 (read-write-search for all) for each required subdirectory.
+As an alternative to changing the ownership, you can set the permissions to 0777 (read-write-search/execute for all) for each required subdirectory.
 
 After creating, formatting, and configuring the disks, you must create a Kubernetes persistent volume resource for each disk and bind a corresponding persistent volume claim resource to each persistent volume.  Again, the particulars on creating these resources vary slightly for each Kubernetes cluster, but assuming, for example, a GCE persistent disk named 'l6s-mysql' formatted with the ext4 filesystem, the required resources for a static MySQL volume will resemble:
 
@@ -133,7 +133,7 @@ After creating, formatting, and configuring the disks, you must create a Kuberne
         matchLabels:
           forProvider: mysql
 
-Be sure to first create the namespace in which the application will be deployed and place the persistent volume claims in that namespace.  After creating the claims, invoke helm like:
+Be sure to first create the namespace in which the application will be deployed (`kubectl create namespace librenms`) and place the persistent volume claims in that namespace.  After creating the claims, invoke helm like:
 
     helm install librenms-0.1.0 \
       --generate-name \
