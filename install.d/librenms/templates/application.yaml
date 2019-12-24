@@ -32,24 +32,24 @@ spec:
     port: {{ .Values.Application.servicePort }}
     targetPort: application
 ---
-{{- else if eq .Values.Application.serviceType "loadBalancer" }}
-#apiVersion: v1
-#kind: Service
-#metadata:
-#  namespace: {{ .Release.Namespace }}
-#  name: application
-#spec:
-#  type: LoadBalancer
-#  loadBalancerSourceRanges:
-#  - 0.0.0.0/0
-#  externalTrafficPolicy: Local
-#  selector:
-#    component: application
-#  ports:
-#  - name: application
-#    port: {{ .Values.Application.servicePort }}
-#    targetPort: application
-#---
+{{- else if and (eq .Values.Application.serviceType "loadBalancer") .Values.Application.installLoadBalancer }}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: application
+spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  externalTrafficPolicy: Local
+  selector:
+    component: application
+  ports:
+  - name: application
+    port: {{ .Values.Application.servicePort }}
+    targetPort: application
+---
 {{- else }}
 apiVersion: v1
 kind: Service

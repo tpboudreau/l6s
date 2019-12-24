@@ -18,6 +18,7 @@ Application:
   providerPort: 8000
   ingressHost:
   ingressPath: "/"
+  installLoadBalancer: false
   baseURL:
   memoryLimit: 1024
   prepareVolumeImage:

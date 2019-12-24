@@ -261,6 +261,20 @@ After creating the load balancer service, you may deploy the chart.  When invoki
 
 Replace 'n.n.n.n' with the external IP address of your load balancer.  If you have chosen a port other than 80 (for http:) or 443 (for https:) you should include the port number in your base URL.
 
+> When using an IP address in your base URL, you must first create the load balancer service (outside of your helm deployment) in order to learn the external IP address for the service needed to construct the Application.baseURL value.  For this reason, the chart does not create a service for the application as part of the installation when the serviceType is 'loadBalancer'.  However, if you intend to assign a hostname to the load balancer service, and you know this hostname before installing the chart, you can override the default behavior and instruct helm to create the load balancer service as part of the deployment.  You can do this by setting the Application.installLoadBalancer to 'true', like:
+
+>        helm install librenms-0.1.0 \
+>          --generate-name \
+>          --values values.yaml \
+>          --namespace librenms \
+>          --set credentials.application.key=$(docker run --rm tpboudreau/librenms-generate-key) \
+>          --set Application.serviceType=loadBalancer \
+>          --set Application.installLoadBalancer=true \
+>          --set Application.baseURL='http://librenms.example.com/' \
+>          --set librenmsServices.mysql.storage.type=temporary \
+>          --set librenmsServices.rrdcached.storage.type=temporary \
+>          --set librenmsServices.redis.storage.type=temporary
+
 You should choose the appropriate storage type for each supporting service and provide the required supplementary values as described above.
 
 ##### ClusterIP Service
