@@ -165,11 +165,11 @@ You may configure your MySQL instance as appropriate for your needs and environm
 
 Make sure that the librenms user password is appropriately secure and confidential.
 
-> Note that for an ordinary, in-cluster MySQL database, the MySQL credentials passed to helm at installation are those which ***will be created during deployment***.  However, when running your MySQL instance outside the installation cluster, these credentials are those which you ***have already created in your MySQL instance*** and that LibreNMS should use to connect.  Also, for non-cluster MySQL databases, you need not provide the root password for your instance.
+> Note that for an ordinary, in-cluster MySQL database, the MySQL credentials passed to helm at installation are those which ***will be created during deployment***.  However, when running your MySQL instance outside the installation cluster, the MySQL credentials passed to helm are those which you ***have already created in your MySQL instance*** (with SQL similar to that shown here) and that LibreNMS should use to connect.  Also, for non-cluster MySQL databases, you need not provide the root password for your instance.
 
 ##### RRDCached
 
-You may configure and run the rrdcached server as appropriate for your environment.  Be sure to permit recursive access to the base data directory (with the '-R' command line option) as LibreNMS typically creates one subdirectory per device.
+You may configure and run the rrdcached server as appropriate for your environment.  Be sure to permit recursive access to the base data directory (with the '-R' command line option) as LibreNMS typically creates one subdirectory per device for RRD files.
 
 ##### Installation
 
