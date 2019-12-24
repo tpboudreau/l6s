@@ -36,7 +36,8 @@ spec:
     port: {{ .Values.Application.servicePort }}
     targetPort: application
 ---
-{{- else if and (eq .Values.Application.serviceType "loadBalancer") .Values.Application.installLoadBalancer }}
+{{- else if eq .Values.Application.serviceType "loadBalancer" }}
+{{- if .Values.Application.installLoadBalancer }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -54,6 +55,7 @@ spec:
     port: {{ .Values.Application.servicePort }}
     targetPort: application
 ---
+{{- end }}
 {{- else }}
 apiVersion: v1
 kind: Service
