@@ -51,7 +51,7 @@ spec:
       initContainers:
       - name: create-subpath
         image: {{ .Values.subpath.image.repository }}:{{ .Values.subpath.image.tag }}
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
         - name: SUBPATHS
           value: "data"

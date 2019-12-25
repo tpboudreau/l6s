@@ -1,7 +1,7 @@
 {{- define "librenms.checks" }}
 - name: check-mysql
   image: {{ .Values.checkMySQL.image.repository }}:{{ .Values.checkMySQL.image.tag }}
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   envFrom:
   - configMapRef:
       name: application

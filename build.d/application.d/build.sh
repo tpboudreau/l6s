@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export REPO='https://github.com/tpboudreau/librenms/tarball/use_snmp_ping'
-export TAG='0.1'
+export TAG=$(cat ../VERSION)
 
 # Appllcation pod images
 docker build --build-arg MODE=prepare-volume --build-arg REPO=${REPO} -t tpboudreau/librenms-application-prepare-volume:${TAG} .

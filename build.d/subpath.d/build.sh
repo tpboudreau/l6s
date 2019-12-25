@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker build -t tpboudreau/librenms-subpath:0.1 .
+docker build -t tpboudreau/librenms-subpath:$(cat ../VERSION) .
 

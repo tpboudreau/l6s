@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker build -t tpboudreau/librenms-device-v2c:0.1 .
+docker build -t tpboudreau/librenms-device-v2c:$(cat ../../VERSION) .
 

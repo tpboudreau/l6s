@@ -76,7 +76,7 @@ spec:
       {{- if and (eq .Values.mysql.storage.type "dynamic") .Values.mysql.storage.subpathRequired }}
       - name: create-subpath
         image: {{ .Values.subpath.image.repository }}:{{ .Values.subpath.image.tag }}
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
         - name: SUBPATHS
           value: "configuration|database|initialization"
@@ -90,7 +90,7 @@ spec:
       {{- end }}
       - name: prepare-volume
         image: {{ .Values.mysql.prepareVolumeImage.repository }}:{{ .Values.mysql.prepareVolumeImage.tag }}
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
             name: mysql

@@ -16,20 +16,23 @@ Application:
   serviceType: cluster
   servicePort: 80
   providerPort: 8000
+  # for .serviceType 'ingress' ...
   ingressHost:
   ingressPath: "/"
+  # for .serviceType 'loadBalancer' ...
   installLoadBalancer: false
   baseURL:
+  #
   memoryLimit: 1024
   prepareVolumeImage:
     repository: "docker.io/tpboudreau/librenms-application-prepare-volume"
-    tag: "0.1"
+    tag: "0.1.0"
   phpImage:
     repository: "docker.io/tpboudreau/librenms-application-php-fpm"
-    tag: "0.1"
+    tag: "0.1.0"
   nginxImage:
     repository: "docker.io/tpboudreau/librenms-application-nginx"
-    tag: "0.1"
+    tag: "0.1.0"
   replicas: 1
   TLS:
 
@@ -41,34 +44,35 @@ Dispatcher:
   logLevel: "-v"
   image:
     repository: "docker.io/tpboudreau/librenms-dispatcher"
-    tag: "0.1"
+    tag: "0.1.0"
 
 snmpPing:
   enabled: false
+  # for .snmpPing.enabled true ...
   recordRTT: true
 
 checkMySQL:
   image:
     repository: "docker.io/tpboudreau/librenms-check-mysql"
-    tag: "0.1"
+    tag: "0.1.0"
 
 checkRRDcached:
   image:
     repository: "docker.io/tpboudreau/librenms-check-rrdcached"
-    tag: "0.1"
+    tag: "0.1.0"
 
 checkMemcached:
   image:
     repository: "docker.io/tpboudreau/librenms-check-memcached"
-    tag: "0.1"
+    tag: "0.1.0"
 
 checkRedis:
   image:
     repository: "docker.io/tpboudreau/librenms-check-redis"
-    tag: "0.1"
+    tag: "0.1.0"
 
 cleanupApplication:
   image:
     repository: "docker.io/tpboudreau/librenms-cleanup-application"
-    tag: "0.1"
+    tag: "0.1.0"
 

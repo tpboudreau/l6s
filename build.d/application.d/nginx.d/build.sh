@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker build -t tpboudreau/librenms-application-nginx:0.1 .
+docker build -t tpboudreau/librenms-application-nginx:$(cat ../../VERSION) .
 
