@@ -42,7 +42,8 @@ FROM base as build
 
 ARG REPO
 
-RUN apt-get -q install -y wget && \
+RUN apt-get update -y && \
+    apt-get -q install -y wget && \
     mkdir -p /opt/librenms && \
     chown librenms:librenms /opt/librenms && \
     chmod 770 /opt/librenms
@@ -114,7 +115,8 @@ FROM build as dispatcher
 
 WORKDIR /opt/librenms
 
-RUN apt-get -q install -y gettext-base python3-pip && \
+RUN apt-get update -y && \
+    apt-get -q install -y gettext-base python3-pip && \
     pip3 install -r requirements.txt
 
 COPY common.d/librenms.config.php /tmp/librenms.config.php
@@ -205,7 +207,8 @@ FROM application-php-fpm as validate-application
 
 USER root
 
-RUN apt-get -q install -y git
+RUN apt-get update -y && \
+    apt-get -q install -y git
 
 USER librenms
 
