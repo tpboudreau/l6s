@@ -11,7 +11,7 @@ RUN apt-get -qq update && \
     apt-get -qq install -y software-properties-common && \
     add-apt-repository universe && \
     DEBIAN_FRONTEND=noninteractive apt-get -qq install tzdata && \
-    apt-get -qq install -y acl composer curl fping graphviz imagemagick mariadb-client memcached mtr-tiny nmap python-memcache python-mysqldb rrdtool snmp unzip whois && \
+    apt-get -qq install -y acl composer curl fping graphviz imagemagick mariadb-client memcached mtr-tiny nmap python-memcache python-mysqldb rrdtool snmp unzip vim whois && \
     apt-get -qq install -y pkg-config php7.2-dev zlib1g-dev libmemcached-dev && \
     apt-get -qq install -y php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-mysqlnd php7.2-snmp php7.2-xml php7.2-zip
 

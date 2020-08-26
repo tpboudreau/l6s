@@ -1,7 +1,7 @@
 
 image:
   repositoryRoot: "docker.io/tpboudreau/librenms-device"
-  tag: "0.1.4"
+  tag: "0.1.5"
 
 Devices:
 - DeviceName: "test-device-zero"

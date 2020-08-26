@@ -19,7 +19,6 @@ docker build --build-arg MODE=generate-key --build-arg REPO=${REPO} -t tpboudrea
 # Dispatcher pod images
 docker build --build-arg MODE=dispatcher --build-arg REPO=${REPO} -t tpboudreau/librenms-dispatcher:${TAG} .
 
-
 cd ./nginx.d && ./build.sh && cd ..
 cd ./check-memcached.d && ./build.sh && cd ..
 cd ./check-redis.d && ./build.sh && cd ..

@@ -95,7 +95,7 @@ spec:
       initContainers:
       - name: prepare-volume
         image: {{ .Values.Application.prepareVolumeImage.repository }}:{{ .Values.Application.prepareVolumeImage.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: application
@@ -127,7 +127,7 @@ spec:
       containers:
       - name: php-fpm
         image: {{ .Values.Application.phpImage.repository }}:{{ .Values.Application.phpImage.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: application
@@ -138,7 +138,7 @@ spec:
           mountPath: /sock
       - name: nginx
         image: {{ .Values.Application.nginxImage.repository }}:{{ .Values.Application.nginxImage.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: application

@@ -12,7 +12,7 @@ spec:
           containers:
           - name: cleanup-application
             image: {{ .Values.cleanupApplication.image.repository }}:{{ .Values.cleanupApplication.image.tag }}
-            imagePullPolicy: IfNotPresent
+            imagePullPolicy: Always
             envFrom:
             - configMapRef:
                 name: application

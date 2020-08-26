@@ -32,7 +32,7 @@ spec:
       containers:
       - name: dispatcher
         image: {{ .Values.Dispatcher.image.repository }}:{{ .Values.Dispatcher.image.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: application
