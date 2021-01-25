@@ -2,7 +2,7 @@
 ARG MODE
 ARG REPO
 
-FROM ubuntu:18.04 as base
+FROM ubuntu:20.04 as base
 
 ARG TIMEZONE=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TIMEZONE /etc/localtime && echo $TIMEZONE > /etc/timezone
@@ -11,9 +11,47 @@ RUN apt-get -qq update && \
     apt-get -qq install -y software-properties-common && \
     add-apt-repository universe && \
     DEBIAN_FRONTEND=noninteractive apt-get -qq install tzdata && \
-    apt-get -qq install -y acl composer curl fping graphviz imagemagick mariadb-client memcached mtr-tiny nmap python-memcache python-mysqldb rrdtool snmp unzip vim whois && \
-    apt-get -qq install -y pkg-config php7.2-dev zlib1g-dev libmemcached-dev && \
-    apt-get -qq install -y php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-mysqlnd php7.2-snmp php7.2-xml php7.2-zip
+    apt-get -qq install -y \
+      acl \
+      composer \
+      curl \
+      fping \
+      graphviz \
+      imagemagick \
+      mariadb-client \
+      memcached \
+      mtr-tiny \
+      nmap \
+      python3-pymysql \
+      python3-dotenv \
+      python3-redis \
+      python3-setuptools \
+      rrdtool \
+      snmp \
+      unzip \
+      vim \
+      whois \
+      wget
+
+RUN apt-get -qq install -y \
+      pkg-config \
+      php7.4-dev \
+      zlib1g-dev \
+      libmemcached-dev && \
+    apt-get -qq install -y \
+      php7.4-cli \
+      php7.4-common \
+      php7.4-curl \
+      php7.4-fpm \
+      php7.4-gd \
+      php7.4-json \
+      php7.4-ldap \
+      php7.4-mbstring \
+      php7.4-mysql \
+      php7.4-mysqlnd \
+      php7.4-snmp \
+      php7.4-xml \
+      php7.4-zip
 
 RUN groupadd -g 1010 -r librenms && \
     useradd -c librenms -u 1010 -g 1010 -r -M librenms
@@ -27,11 +65,11 @@ RUN mkdir build && \
     cd / && \
     rm -rf /build
 
-COPY common.d/memcached.ini /etc/php/7.2/mods-available/
-COPY common.d/timezone.ini /etc/php/7.2/cli/conf.d
-COPY common.d/timezone.ini /etc/php/7.2/fpm/conf.d
-RUN ln -s /etc/php/7.2/mods-available/memcached.ini /etc/php/7.2/cli/conf.d/memcached.ini && \
-    ln -s /etc/php/7.2/mods-available/memcached.ini /etc/php/7.2/fpm/conf.d/memcached.ini
+COPY common.d/memcached.ini /etc/php/7.4/mods-available/
+COPY common.d/timezone.ini /etc/php/7.4/cli/conf.d
+COPY common.d/timezone.ini /etc/php/7.4/fpm/conf.d
+RUN ln -s /etc/php/7.4/mods-available/memcached.ini /etc/php/7.4/cli/conf.d/memcached.ini && \
+    ln -s /etc/php/7.4/mods-available/memcached.ini /etc/php/7.4/fpm/conf.d/memcached.ini
 
 RUN rm /etc/systemd/system/multi-user.target.wants/*.service && \
     rm /etc/systemd/system/timers.target.wants/*.timer
@@ -43,7 +81,6 @@ FROM base as build
 ARG REPO
 
 RUN apt-get update -y && \
-    apt-get -q install -y wget && \
     mkdir -p /opt/librenms && \
     chown librenms:librenms /opt/librenms && \
     chmod 770 /opt/librenms
@@ -154,8 +191,8 @@ ENTRYPOINT ["/entrypoint.sh"]
 FROM build as check-mysql
 
 RUN apt-get update -y && \
-    apt-get -q install -y gettext-base python-pip && \
-    pip install mysql-connector
+    apt-get -q install -y gettext-base python3-pip && \
+    pip3 install mysql-connector
 
 COPY check-mysql.d/entrypoint.sh /entrypoint.sh
 COPY common.d/services.sh /services.sh
@@ -187,11 +224,11 @@ RUN mkdir -p /sock && \
     chmod 777 /sock && \
     chmod 777 /run
 
-COPY php-fpm.d/php-fpm.conf /etc/php/7.2/fpm/php-fpm.conf
-RUN rm /etc/php/7.2/fpm/pool.d/*
-COPY php-fpm.d/docker.first.conf /etc/php/7.2/fpm/pool.d/+docker.conf
-COPY php-fpm.d/librenms.conf /etc/php/7.2/fpm/pool.d/librenms.conf
-COPY php-fpm.d/docker.last.conf /etc/php/7.2/fpm/pool.d/~docker.conf
+COPY php-fpm.d/php-fpm.conf /etc/php/7.4/fpm/php-fpm.conf
+RUN rm /etc/php/7.4/fpm/pool.d/*
+COPY php-fpm.d/docker.first.conf /etc/php/7.4/fpm/pool.d/+docker.conf
+COPY php-fpm.d/librenms.conf /etc/php/7.4/fpm/pool.d/librenms.conf
+COPY php-fpm.d/docker.last.conf /etc/php/7.4/fpm/pool.d/~docker.conf
 
 VOLUME /opt/librenms /sock
 
@@ -199,7 +236,7 @@ WORKDIR /opt/librenms
 
 USER librenms
 
-ENTRYPOINT ["/usr/sbin/php-fpm7.2", "-y", "/etc/php/7.2/fpm/php-fpm.conf", "-g", "/run/php-fpm.pid", "-F", "-O"]
+ENTRYPOINT ["/usr/sbin/php-fpm7.4", "-y", "/etc/php/7.4/fpm/php-fpm.conf", "-g", "/run/php-fpm.pid", "-F", "-O"]
 
 #==============================================================================
 

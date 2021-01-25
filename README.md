@@ -35,7 +35,7 @@ Unless otherwise noted, the following sections assume that you have created a va
 To deploy a simple, temporary test installation, just run:
 
     kubectl create namespace librenms
-    helm install librenms-0.1.1 \
+    helm install librenms-0.1.6 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -63,7 +63,7 @@ To remove the application from the cluster, find the name generated for the depl
 Production deployments will obviously require persistent storage for the database services.  To dynamically allocate persistent volumes during installation, first create a target namespace, then invoke helm like:
 
     kubectl create namespace librenms
-    helm install librenms-0.1.1 \
+    helm install librenms-0.1.6 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -135,7 +135,7 @@ After creating, formatting, and configuring the disks, you must create a Kuberne
 
 Be sure to first create the namespace in which the application will be deployed (`kubectl create namespace librenms`) and place the persistent volume claims in that namespace.  After creating the claims, invoke helm like:
 
-    helm install librenms-0.1.1 \
+    helm install librenms-0.1.6 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -176,7 +176,7 @@ You may configure and run the rrdcached server as appropriate for your environme
 After instantiating your non-cluster database services, invoke helm like:
 
     kubectl create namespace librenms
-    helm install librenms-0.1.1 \
+    helm install librenms-0.1.6 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -197,7 +197,7 @@ Of course, you will need to choose the appropriate storage type for the Redis se
 
 LibreNMS ordinarily uses fping (or ping) to test via ICMP whether monitored devices are reachable or 'up'.  However, some Kubernetes clusters prohibit the execution of binaries such as fping that require privileged capabilities (such as an enabled setuid bit or Linux privileged networking capabilities).  For deployment in such clusters, you must instruct LibreNMS to "ping" devices using SNMP.  To enable this, invoke helm like:
 
-    helm install librenms-0.1.1 \
+    helm install librenms-0.1.6 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -248,7 +248,7 @@ You may choose any port (spec.ports.port) on which to expose your application, b
 
 After creating the load balancer service, you may deploy the chart.  When invoking helm, you must indicate how your load balancer service can be reached by supplying the base URL for the application -- either using the external IP address assigned to your load balancer service when it was created or a hostname associated with that address:
 
-    helm install librenms-0.1.1 \
+    helm install librenms-0.1.6 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
@@ -263,7 +263,7 @@ Replace 'n.n.n.n' with the external IP address of your load balancer.  If you ha
 
 > When using an IP address in your base URL, you must first create the load balancer service (outside of your helm deployment) in order to learn the external IP address for the service needed to construct the Application.baseURL value.  For this reason, by default the chart does not create a service for the application as part of the installation when the serviceType is 'loadBalancer'.  However, if you intend to assign a hostname to the load balancer service, and you know this hostname before installing the chart, you can override the default behavior and instruct helm to create the load balancer service as part of the deployment.  Do this by setting the Application.installLoadBalancer key to 'true', like:
 >
->        helm install librenms-0.1.1 \
+>        helm install librenms-0.1.6 \
 >          --generate-name \
 >          --values values.yaml \
 >          --namespace librenms \
@@ -281,7 +281,7 @@ You should choose the appropriate storage type for each supporting service and p
 
 Alternatively, to instruct helm to create only a ClusterIP service for LibreNMS, invoke helm like:
 
-    helm install librenms-0.1.1 \
+    helm install librenms-0.1.6 \
       --generate-name \
       --values values.yaml \
       --namespace librenms \
