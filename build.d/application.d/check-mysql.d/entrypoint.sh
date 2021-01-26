@@ -2,5 +2,5 @@
 
 . /services.sh
 
-/check_database.py
+exec /check_database.py
 

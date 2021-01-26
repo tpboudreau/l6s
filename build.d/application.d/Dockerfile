@@ -99,7 +99,7 @@ RUN tar czf /tmp/librenms.tar.gz --acls /opt/librenms
 
 #==============================================================================
 
-FROM ubuntu:18.04 as prepare-volume
+FROM ubuntu:20.04 as prepare-volume
 
 RUN apt-get update -y && \
     apt-get -q install -y gettext-base 
