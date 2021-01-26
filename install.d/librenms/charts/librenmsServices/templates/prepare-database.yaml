@@ -29,7 +29,7 @@ spec:
       containers:
       - name: prepare-database
         image: {{ .Values.mysql.prepareDatabaseImage.repository }}:{{ .Values.mysql.prepareDatabaseImage.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: application

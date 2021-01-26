@@ -51,7 +51,7 @@ spec:
       initContainers:
       - name: create-subpath
         image: {{ .Values.subpath.image.repository }}:{{ .Values.subpath.image.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
         - name: SUBPATHS
           value: "data"
@@ -66,7 +66,7 @@ spec:
       containers:
       - name: redis
         image: {{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: redis

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 import os
 import sys
@@ -10,7 +11,7 @@ def has_librenms_database(db):
     rs.execute("SHOW DATABASES")
     ds = {r[0] for r in rs}
     dx = {
-        unicode('librenms', encoding='utf-8')
+        'librenms'
     }
     return dx.issubset(ds)
 
@@ -21,9 +22,9 @@ def has_librenms_character_set(db):
     cn = 0
     for r in rs:
         ch, co = r
-        if unicode('utf8', encoding='utf-8') == ch:
+        if 'utf8' == ch:
             cn += 1
-        if unicode('utf8_unicode_ci', encoding='utf-8') == co:
+        if 'utf8_unicode_ci' == co:
             cn += 1
     return cn == 2
 
@@ -33,14 +34,14 @@ def has_librenms_tables(db):
     rs.execute("SHOW TABLES")
     ts = {r[0] for r in rs}
     tx = {
-        unicode('customers', encoding='utf-8'),
-        unicode('dashboards', encoding='utf-8'),
-        unicode('devices', encoding='utf-8'),
-        unicode('eventlog', encoding='utf-8'),
-        unicode('notifications', encoding='utf-8'),
-        unicode('pollers', encoding='utf-8'),
-        unicode('users', encoding='utf-8'),
-        unicode('vlans', encoding='utf-8'),
+        'customers',
+        'dashboards',
+        'devices',
+        'eventlog',
+        'notifications',
+        'pollers',
+        'users',
+        'vlans',
     }
 
     ox = []
@@ -50,7 +51,7 @@ def has_librenms_tables(db):
         cs.execute(qy)
         for c in cs:
             _, _, _, ok = c
-            ox.append(unicode('OK', encoding='utf-8') == ok)
+            ox.append('OK' == ok)
 
     return tx.issubset(ts) and all(ox)
 

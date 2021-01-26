@@ -34,7 +34,7 @@ else
     chown librenms:librenms ${LIBRENMS_WORKDIR}/config.php && \
     chmod 640 ${LIBRENMS_WORKDIR}/config.php ) || exit 3
 
-  php ./build-base.php || exit 4
+  php ./includes/sql-schema/update.php || exit 4
 
   if [ -z "${LIBRENMS_ADMINISTRATIVE_USER}" ] || [ -z "${LIBRENMS_ADMINISTRATIVE_PASSWORD}" ]; then
     echo $(stamp) "[ERROR] both LIBRENMS_ADMINISTRATIVE_USER and LIBRENMS_ADMINISTRATIVE_PASSWORD must be provided as environment variables"

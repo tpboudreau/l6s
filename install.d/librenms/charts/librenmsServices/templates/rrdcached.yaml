@@ -76,7 +76,7 @@ spec:
       initContainers:
       - name: create-subpath
         image: {{ .Values.subpath.image.repository }}:{{ .Values.subpath.image.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
         - name: SUBPATHS
           value: "data|journal"
