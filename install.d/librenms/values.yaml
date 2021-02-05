@@ -9,6 +9,14 @@ credentials:
     rootPassword:
     user:
     password:
+  ldap:
+    user:
+    userDN:
+    password:
+  active_directory:
+    user:
+    userDN:
+    password:
   redis:
     password:
   
@@ -16,6 +24,8 @@ Application:
   serviceType: cluster
   servicePort: 80
   providerPort: 8000
+  authMechanism: "mysql"
+  mountCertificates: false
   # for .serviceType 'ingress' ...
   ingressHost:
   ingressPath: "/"
@@ -26,15 +36,45 @@ Application:
   memoryLimit: 1024
   prepareVolumeImage:
     repository: "docker.io/tpboudreau/librenms-application-prepare-volume"
-    tag: "0.1.6"
+    tag: "0.1.7"
   phpImage:
     repository: "docker.io/tpboudreau/librenms-application-php-fpm"
-    tag: "0.1.6"
+    tag: "0.1.7"
   nginxImage:
     repository: "docker.io/tpboudreau/librenms-application-nginx"
-    tag: "0.1.6"
+    tag: "0.1.7"
   replicas: 1
   TLS:
+
+LDAP:
+  debug: false
+  server: "ldap://localhost"
+  port: 636
+  version: 3
+  prefix: "uid="
+  suffix: ",ou=users,dc=example,dc=org"
+  groupBase: "ou=groups,dc=example,dc=org"
+  adminGroup: "adminGroup"
+  userGroup: "userGroup"
+  groupMemberAttribute: "memberUid"
+  userDN: true
+  wildcardOU: false
+  uidAttribute:
+  group:
+
+ActiveDirectory:
+  debug: false
+  url: "ldaps://server.example.org"
+  timeout: 5
+  domain: "example.org"
+  check_certificates: true
+  base_dn: "dc=example,dc=org"
+  users_purge: 30
+  require_groupmembership: true
+  admin_group: "adminGroup"
+  user_group: "userGroup"
+  user_filter:
+  group_filter:
 
 Dispatcher:
   instances: 4
@@ -44,7 +84,7 @@ Dispatcher:
   logLevel: "-v"
   image:
     repository: "docker.io/tpboudreau/librenms-dispatcher"
-    tag: "0.1.6"
+    tag: "0.1.7"
 
 snmpPing:
   enabled: false
@@ -54,25 +94,28 @@ snmpPing:
 checkMySQL:
   image:
     repository: "docker.io/tpboudreau/librenms-check-mysql"
-    tag: "0.1.6"
+    tag: "0.1.7"
 
 checkRRDcached:
   image:
     repository: "docker.io/tpboudreau/librenms-check-rrdcached"
-    tag: "0.1.6"
+    tag: "0.1.7"
 
 checkMemcached:
   image:
     repository: "docker.io/tpboudreau/librenms-check-memcached"
-    tag: "0.1.6"
+    tag: "0.1.7"
 
 checkRedis:
   image:
     repository: "docker.io/tpboudreau/librenms-check-redis"
-    tag: "0.1.6"
+    tag: "0.1.7"
 
 cleanupApplication:
   image:
     repository: "docker.io/tpboudreau/librenms-cleanup-application"
-    tag: "0.1.6"
+    tag: "0.1.7"
+
+global:
+  authMechanism: "foo"
 

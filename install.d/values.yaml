@@ -12,6 +12,14 @@ credentials:
     rootPassword: "mysqlRootPassword"
     user: "librenms"
     password: "userPassword"
+  ldap:
+    bindUser: "ldapBindUser"
+    bindDN:
+    bindPassword: "ldapBindPassword"
+  active_directory:
+    bindUser: "adBindUser"
+    bindDN:
+    bindPassword: "adBindPassword"
   redis:
     password: "redisPassword"
 

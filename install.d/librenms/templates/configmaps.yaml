@@ -12,6 +12,45 @@ data:
   LIBRENMS_MYSQL_DATABASE: "librenms"
   LIBRENMS_MEMORY_LIMIT: {{ .Values.Application.memoryLimit | quote }}
   LIBRENMS_BASE_URL: {{ coalesce .Values.Application.baseURL ( cat "http://" .Values.Application.ingressHost .Values.Application.ingressPath | nospace ) | quote }}
+  LIBRENMS_AUTH_MECHANISM: {{ .Values.Application.authMechanism | quote }}
+  {{- if eq .Values.Application.authMechanism "ldap" }}
+  LIBRENMS_AUTH_LDAP_DEBUG: {{ .Values.LDAP.debug | quote }}
+  LIBRENMS_AUTH_LDAP_SERVER: {{ .Values.LDAP.server | quote }}
+  LIBRENMS_AUTH_LDAP_PORT: {{ .Values.LDAP.port | quote }}
+  LIBRENMS_AUTH_LDAP_VERSION: {{ .Values.LDAP.version | quote }}
+  LIBRENMS_AUTH_LDAP_PREFIX: {{ .Values.LDAP.prefix | quote }}
+  LIBRENMS_AUTH_LDAP_SUFFIX: {{ .Values.LDAP.suffix | quote }}
+  LIBRENMS_AUTH_LDAP_GROUPBASE: {{ .Values.LDAP.groupBase | quote }}
+  LIBRENMS_AUTH_LDAP_ADMIN_GROUP: {{ .Values.LDAP.adminGroup | quote }}
+  LIBRENMS_AUTH_LDAP_USER_GROUP: {{ .Values.LDAP.userGroup | quote }}
+  LIBRENMS_AUTH_LDAP_GROUPMEMBERATTR: {{ .Values.LDAP.groupMemberAttribute | quote }}
+  LIBRENMS_AUTH_LDAP_USERDN: {{ .Values.LDAP.userDN | quote }}
+  LIBRENMS_AUTH_LDAP_WILDCARD_OU: {{ .Values.LDAP.wildcardOU | quote }}
+  {{- if .Values.LDAP.uidAttribute }}
+  LIBRENMS_AUTH_LDAP_UID_ATTRIBUTE: {{ .Values.LDAP.uidAttribute | quote }}
+  {{- end }}
+  {{- if .Values.LDAP.group }}
+  LIBRENMS_AUTH_LDAP_GROUP: {{ .Values.LDAP.group | quote }}
+  {{- end }}
+  {{- end }}
+  {{- if eq .Values.Application.authMechanism "active_directory" }}
+  LIBRENMS_AUTH_AD_DEBUG: {{ .Values.ActiveDirectory.debug | quote }}
+  LIBRENMS_AUTH_AD_URL: {{ .Values.ActiveDirectory.url | quote }}
+  LIBRENMS_AUTH_AD_TIMEOUT: {{ .Values.ActiveDirectory.timeout | quote }}
+  LIBRENMS_AUTH_AD_DOMAIN: {{ .Values.ActiveDirectory.domain | quote }}
+  LIBRENMS_AUTH_AD_CHECK_CERTIFICATES: {{ .Values.ActiveDirectory.check_certificates | quote }}
+  LIBRENMS_AUTH_AD_BASE_DN: {{ .Values.ActiveDirectory.base_dn | quote }}
+  LIBRENMS_AUTH_AD_USERS_PURGE: {{ .Values.ActiveDirectory.users_purge | quote }}
+  LIBRENMS_AUTH_AD_REQUIRE_GROUPMEMBERSHIP: {{ .Values.ActiveDirectory.require_groupmembership | quote }}
+  LIBRENMS_AUTH_AD_ADMIN_GROUP: {{ .Values.ActiveDirectory.admin_group | quote }}
+  LIBRENMS_AUTH_AD_USER_GROUP: {{ .Values.ActiveDirectory.user_group | quote }}
+  {{- if .Values.ActiveDirectory.user_filter }}
+  LIBRENMS_AUTH_AD_USER_FILTER: {{ .Values.ActiveDirectory.user_filter | quote }}
+  {{- end }}
+  {{- if .Values.ActiveDirectory.group_filter }}
+  LIBRENMS_AUTH_AD_GROUP_FILTER: {{ .Values.ActiveDirectory.group_filter | quote }}
+  {{- end }}
+  {{- end }}
   {{- if .Values.snmpPing.enabled }}
   LIBRENMS_SNMP_PING: "true"
   LIBRENMS_SNMP_PING_RTT: {{ .Values.snmpPing.recordRTT | quote }}

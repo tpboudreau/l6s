@@ -71,6 +71,7 @@ def valid_librenms_instance():
         MYSQL_PORT = os.getenv('LIBRENMS_MYSQL_PORT')
         MYSQL_USER = os.getenv('LIBRENMS_MYSQL_USER')
         MYSQL_PASSWORD = os.getenv('LIBRENMS_MYSQL_PASSWORD')
+        print("Connecting to %s:%s with user %s" % (MYSQL_HOST, MYSQL_PORT, MYSQL_USER))
         cf = {
             'host': MYSQL_HOST,
             'port': MYSQL_PORT,
@@ -83,19 +84,33 @@ def valid_librenms_instance():
     except mysql.connector.Error as err:
         print(err)
     else:
-        ok = (
-            has_librenms_database(db) and
-            has_librenms_character_set(db) and
-            has_librenms_tables(db) and
-            has_librenms_administrator(db)
-        )
+        ok = True
+        if not has_librenms_database(db):
+            print("No database named librenms was present on the database server.")
+            ok = False
+        if not has_librenms_character_set(db):
+            print("Character set incorrect on database server. Please run the following on the database server:")
+            print("ALTER DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;")
+            ok = False
+        if not has_librenms_tables(db):
+            print("There are at least some missing tables on the server.")
+            print("Please make sure you have run the prepare-database job.")
+            ok = False
+
+        AUTH_MECHANISM = os.getenv('LIBRENMS_AUTH_MECHANISM')
+        if AUTH_MECHANISM == "mysql":
+            if not has_librenms_administrator(db):
+                print("Could not find any administrator user in the database.")
+                print("Please make sure you have run the prepare-database job and haven't removed the user with level=10.")
+                ok = False
+
         db.close()
     return ok
 
 
 if __name__ == "__main__":
     if valid_librenms_instance():
-        print("LibreNMS database instance validated")
+        print("LibreNMS database instance validated.")
     else:
-        print("Unable to validate LibreNMS database instance")
+        print("Unable to validate LibreNMS database instance.")
         sys.exit(1)

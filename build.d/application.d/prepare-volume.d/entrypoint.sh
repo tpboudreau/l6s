@@ -35,7 +35,11 @@ if [[ -d /opt/librenms ]]; then
       chmod 640 ${LIBRENMS_WORKDIR}/.env ) || exit 3
 
     echo $(stamp) "[INFO] configuring application"
-    ( cat /tmp/librenms.config.php /tmp/librenms.dispatcher.config.php | envsubst "$(printf '${%s} ' ${!LIBRENMS*})" > ${LIBRENMS_WORKDIR}/config.php && \
+    ( cat /tmp/librenms.config.php /tmp/librenms.dispatcher.config.php /tmp/librenms.ldap.config.php /tmp/librenms.ad.config.php | \
+      envsubst "$(printf '${%s} ' ${!LIBRENMS*})" | \
+      grep -v 'LIBRENMS_AUTH_LDAP_' | \
+      grep -v 'LIBRENMS_AUTH_AD_' > \
+      ${LIBRENMS_WORKDIR}/config.php && \
       chown librenms:librenms ${LIBRENMS_WORKDIR}/config.php && \
       chmod 640 ${LIBRENMS_WORKDIR}/config.php ) || exit 4
   fi

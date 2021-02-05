@@ -2,7 +2,7 @@
 
 $config['user'] = 'librenms';
 $config['distributed_poller'] = true;
-$config['auth_mechanism'] = 'mysql';
+$config['auth_mechanism'] = '${LIBRENMS_AUTH_MECHANISM}';
 $config['update'] = 0;
 $config['base_url'] = '${LIBRENMS_BASE_URL}';
 

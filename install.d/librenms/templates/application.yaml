@@ -1,6 +1,5 @@
 {{- if eq .Values.Application.serviceType "ingress" }}
 apiVersion: networking.k8s.io/v1beta1
-#apiVersion: extensions/v1beta1 
 kind: Ingress
 metadata:
   namespace: {{ .Release.Namespace }}
@@ -110,6 +109,44 @@ spec:
             secretKeyRef:
               name: application
               key: librenms_mysql_password
+        {{- if eq .Values.Application.authMechanism "ldap" }}
+        - name: LIBRENMS_AUTH_LDAP_BINDUSER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_ldap_user
+        {{- if .Values.credentials.ldap.userDN }}
+        - name: LIBRENMS_AUTH_LDAP_BINDDN
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_ldap_userdn
+        {{- end }}
+        - name: LIBRENMS_AUTH_LDAP_BINDPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_ldap_password
+        {{- end }}
+        {{- if eq .Values.Application.authMechanism "active_directory" }}
+        - name: LIBRENMS_AUTH_AD_BINDUSER
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_ad_user
+        {{- if .Values.credentials.active_directory.userDN }}
+        - name: LIBRENMS_AUTH_AD_BINDDN
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_ad_userdn
+        {{- end }}
+        - name: LIBRENMS_AUTH_AD_BINDPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application
+              key: librenms_ad_password
+        {{- end }}
         - name: LIBRENMS_REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -136,6 +173,11 @@ spec:
           mountPath: /opt/librenms
         - name: application-socket
           mountPath: /sock
+        {{- if .Values.Application.mountCertificates }}
+        - name: ca-bundle
+          mountPath: /etc/ssl/certs/
+          readOnly: true
+        {{- end }}
       - name: nginx
         image: {{ .Values.Application.nginxImage.repository }}:{{ .Values.Application.nginxImage.tag }}
         imagePullPolicy: Always
@@ -147,6 +189,11 @@ spec:
           mountPath: /opt/librenms
         - name: application-socket
           mountPath: /sock
+        {{- if .Values.Application.mountCertificates }}
+        - name: ca-bundle
+          mountPath: /etc/ssl/certs/
+          readOnly: true
+        {{- end }}
         ports:
         - name: application
           containerPort: {{ .Values.Application.providerPort }}
@@ -157,3 +204,11 @@ spec:
       - name: application-socket
         emptyDir:
           medium: Memory
+      {{- if .Values.Application.mountCertificates }}
+      - name: ca-bundle
+        secret:
+          secretName: ca-bundle
+          items:
+          - key: ca-bundle.crt
+            path: ca-certificates.crt
+      {{- end }}

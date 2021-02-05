@@ -5,13 +5,13 @@ mysql:
   readinessDelay: 15
   image:
     repository: "docker.io/tpboudreau/librenms-mysql"
-    tag: "0.1.6"
+    tag: "0.1.7"
   prepareVolumeImage:
     repository: "docker.io/tpboudreau/librenms-mysql-prepare-volume"
-    tag: "0.1.6"
+    tag: "0.1.7"
   prepareDatabaseImage:
     repository: "docker.io/tpboudreau/librenms-prepare-mysql"
-    tag: "0.1.6"
+    tag: "0.1.7"
   storage:
     type: dynamic
     # for .storage.type 'dynamic' ...
@@ -37,7 +37,7 @@ rrdcached:
   logLevel: "LOG_NOTICE"
   image:
     repository: "docker.io/tpboudreau/librenms-rrdcached"
-    tag: "0.1.6"
+    tag: "0.1.7"
   storage:
     type: dynamic
     # for .storage.type 'dynamic' ...
@@ -60,7 +60,7 @@ memcached:
   logLevel: ""
   image:
     repository: "docker.io/tpboudreau/librenms-memcached"
-    tag: "0.1.6"
+    tag: "0.1.7"
 
 redis:
   servicePort: 6379
@@ -68,7 +68,7 @@ redis:
   logLevel: "notice"
   image:
     repository: "docker.io/tpboudreau/librenms-redis"
-    tag: "0.1.6"
+    tag: "0.1.7"
   storage:
     type: dynamic
     # for .storage.type 'dynamic' ...
@@ -81,5 +81,5 @@ redis:
 subpath:
   image:
     repository: "docker.io/tpboudreau/librenms-subpath"
-    tag: "0.1.6"
+    tag: "0.1.7"
 

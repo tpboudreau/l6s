@@ -30,18 +30,24 @@ else
     chmod 640 ${LIBRENMS_WORKDIR}/.env ) || exit 2
   unset $(cat ${LIBRENMS_WORKDIR}/.env | grep '=' | sed s/=.*$//)
 
-  ( cat /tmp/librenms.config.php /tmp/librenms.dispatcher.config.php | envsubst "$(printf '${%s} ' ${!LIBRENMS*})" > ${LIBRENMS_WORKDIR}/config.php && \
+  ( cat /tmp/librenms.config.php /tmp/librenms.dispatcher.config.php | \
+    envsubst "$(printf '${%s} ' ${!LIBRENMS*})" > \
+    ${LIBRENMS_WORKDIR}/config.php && \
     chown librenms:librenms ${LIBRENMS_WORKDIR}/config.php && \
     chmod 640 ${LIBRENMS_WORKDIR}/config.php ) || exit 3
 
   php ./includes/sql-schema/update.php || exit 4
 
-  if [ -z "${LIBRENMS_ADMINISTRATIVE_USER}" ] || [ -z "${LIBRENMS_ADMINISTRATIVE_PASSWORD}" ]; then
-    echo $(stamp) "[ERROR] both LIBRENMS_ADMINISTRATIVE_USER and LIBRENMS_ADMINISTRATIVE_PASSWORD must be provided as environment variables"
-    exit 5
+  if [ "${LIBRENMS_AUTH_MECHANISM}" == "mysql" ]; then
+    if [ -z "${LIBRENMS_ADMINISTRATIVE_USER}" ] || [ -z "${LIBRENMS_ADMINISTRATIVE_PASSWORD}" ]; then
+      echo $(stamp) "[ERROR] both LIBRENMS_ADMINISTRATIVE_USER and LIBRENMS_ADMINISTRATIVE_PASSWORD must be provided as environment variables"
+      exit 5
+    else
+      echo $(stamp) "[INFO] adding user ${LIBRENMS_ADMINISTRATIVE_USER}"
+      php ./adduser.php ${LIBRENMS_ADMINISTRATIVE_USER} ${LIBRENMS_ADMINISTRATIVE_PASSWORD} 10 ${LIBRENMS_ADMINISTRATIVE_EMAIL} || exit 6
+    fi
   else
-    echo $(stamp) "[INFO] adding user ${LIBRENMS_ADMINISTRATIVE_USER}"
-    php ./adduser.php ${LIBRENMS_ADMINISTRATIVE_USER} ${LIBRENMS_ADMINISTRATIVE_PASSWORD} 10 ${LIBRENMS_ADMINISTRATIVE_EMAIL} || exit 6
+    echo $(stamp) "[INFO] no administrative user will be added to the MySQL database (authorization mechanism is ${LIBRENMS_AUTH_MECHANISM})"
   fi
 fi
 

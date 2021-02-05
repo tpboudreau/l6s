@@ -114,6 +114,8 @@ COPY --from=build /tmp/librenms.tar.gz /tmp/
 COPY common.d/librenms.config.php /tmp/librenms.config.php
 COPY common.d/librenms.env /tmp/librenms.env
 COPY common.d/librenms.dispatcher.config.php /tmp/librenms.dispatcher.config.php
+COPY common.d/librenms.ldap.config.php /tmp/librenms.ldap.config.php
+COPY common.d/librenms.ad.config.php /tmp/librenms.ad.config.php
 RUN chown librenms:librenms /tmp/librenms* && chmod 640 /tmp/librenms*
 
 COPY prepare-volume.d/entrypoint.sh /entrypoint.sh
