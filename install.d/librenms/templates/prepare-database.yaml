@@ -25,10 +25,10 @@ spec:
       initContainers:
       - name: readiness-delay
         image: busybox:latest
-        command: ['sh', '-c', "sleep {{ .Values.mysql.readinessDelay }}"]
+        command: ['sh', '-c', "sleep {{ .Values.Application.mysqlReadinessDelay }}"]
       containers:
       - name: prepare-database
-        image: {{ .Values.mysql.prepareDatabaseImage.repository }}:{{ .Values.mysql.prepareDatabaseImage.tag }}
+        image: {{ .Values.Application.prepareDatabaseImage.repository }}:{{ .Values.Application.prepareDatabaseImage.tag }}
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
@@ -49,7 +49,7 @@ spec:
             secretKeyRef:
               name: application
               key: librenms_redis_password
-        {{- if eq .Values.global.authMechanism "mysql" }}
+        {{- if eq .Values.Application.authMechanism "mysql" }}
         - name: LIBRENMS_ADMINISTRATIVE_USER
           valueFrom:
             secretKeyRef:

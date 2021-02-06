@@ -34,6 +34,10 @@ Application:
   baseURL:
   #
   memoryLimit: 1024
+  mysqlReadinessDelay: 15
+  prepareDatabaseImage:
+    repository: "docker.io/tpboudreau/librenms-application-prepare-mysql"
+    tag: "0.1.7"
   prepareVolumeImage:
     repository: "docker.io/tpboudreau/librenms-application-prepare-volume"
     tag: "0.1.7"
@@ -115,7 +119,4 @@ cleanupApplication:
   image:
     repository: "docker.io/tpboudreau/librenms-cleanup-application"
     tag: "0.1.7"
-
-global:
-  authMechanism: "foo"
 

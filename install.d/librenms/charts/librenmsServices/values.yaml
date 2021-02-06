@@ -2,15 +2,11 @@
 mysql:
   servicePort: 3306
   providerPort: 33306
-  readinessDelay: 15
   image:
     repository: "docker.io/tpboudreau/librenms-mysql"
     tag: "0.1.7"
   prepareVolumeImage:
     repository: "docker.io/tpboudreau/librenms-mysql-prepare-volume"
-    tag: "0.1.7"
-  prepareDatabaseImage:
-    repository: "docker.io/tpboudreau/librenms-prepare-mysql"
     tag: "0.1.7"
   storage:
     type: dynamic

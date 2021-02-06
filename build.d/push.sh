@@ -9,11 +9,11 @@ docker push tpboudreau/librenms-check-memcached:${V} && docker push tpboudreau/l
 docker push tpboudreau/librenms-check-mysql:${V} && docker push tpboudreau/librenms-check-mysql:${M}
 
 docker push tpboudreau/librenms-dispatcher:${V} && docker push tpboudreau/librenms-dispatcher:${M}
+docker push tpboudreau/librenms-application-prepare-mysql:${V} && docker push tpboudreau/librenms-application-prepare-mysql:${M}
 docker push tpboudreau/librenms-application-prepare-volume:${V} && docker push tpboudreau/librenms-application-prepare-volume:${M}
 docker push tpboudreau/librenms-application-php-fpm:${V} && docker push tpboudreau/librenms-application-php-fpm:${M}
 docker push tpboudreau/librenms-application-nginx:${V} && docker push tpboudreau/librenms-application-nginx:${M}
 
-docker push tpboudreau/librenms-prepare-mysql:${V} && docker push tpboudreau/librenms-prepare-mysql:${M}
 docker push tpboudreau/librenms-cleanup-application:${V} && docker push tpboudreau/librenms-cleanup-application:${M}
 docker push tpboudreau/librenms-validate-application:${V} && docker push tpboudreau/librenms-validate-application:${M}
 docker push tpboudreau/librenms-generate-key:latest

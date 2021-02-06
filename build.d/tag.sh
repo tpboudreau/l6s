@@ -9,11 +9,11 @@ docker tag tpboudreau/librenms-check-memcached:${V} tpboudreau/librenms-check-me
 docker tag tpboudreau/librenms-check-mysql:${V} tpboudreau/librenms-check-mysql:${M}
 
 docker tag tpboudreau/librenms-dispatcher:${V} tpboudreau/librenms-dispatcher:${M}
+docker tag tpboudreau/librenms-application-prepare-mysql:${V} tpboudreau/librenms-application-prepare-mysql:${M}
 docker tag tpboudreau/librenms-application-prepare-volume:${V} tpboudreau/librenms-application-prepare-volume:${M}
 docker tag tpboudreau/librenms-application-php-fpm:${V} tpboudreau/librenms-application-php-fpm:${M}
 docker tag tpboudreau/librenms-application-nginx:${V} tpboudreau/librenms-application-nginx:${M}
 
-docker tag tpboudreau/librenms-prepare-mysql:${V} tpboudreau/librenms-prepare-mysql:${M}
 docker tag tpboudreau/librenms-cleanup-application:${V} tpboudreau/librenms-cleanup-application:${M}
 docker tag tpboudreau/librenms-validate-application:${V} tpboudreau/librenms-validate-application:${M}
 #docker tag tpboudreau/librenms-update-application:${V} tpboudreau/librenms-update-application:${M}
