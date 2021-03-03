@@ -37,16 +37,16 @@ Application:
   mysqlReadinessDelay: 15
   prepareDatabaseImage:
     repository: "docker.io/tpboudreau/librenms-application-prepare-mysql"
-    tag: "0.1.7"
+    tag: "0.1.8"
   prepareVolumeImage:
     repository: "docker.io/tpboudreau/librenms-application-prepare-volume"
-    tag: "0.1.7"
+    tag: "0.1.8"
   phpImage:
     repository: "docker.io/tpboudreau/librenms-application-php-fpm"
-    tag: "0.1.7"
+    tag: "0.1.8"
   nginxImage:
     repository: "docker.io/tpboudreau/librenms-application-nginx"
-    tag: "0.1.7"
+    tag: "0.1.8"
   replicas: 1
   TLS:
 
@@ -88,7 +88,7 @@ Dispatcher:
   logLevel: "-v"
   image:
     repository: "docker.io/tpboudreau/librenms-dispatcher"
-    tag: "0.1.7"
+    tag: "0.1.8"
 
 snmpPing:
   enabled: false
@@ -98,25 +98,25 @@ snmpPing:
 checkMySQL:
   image:
     repository: "docker.io/tpboudreau/librenms-check-mysql"
-    tag: "0.1.7"
+    tag: "0.1.8"
 
 checkRRDcached:
   image:
     repository: "docker.io/tpboudreau/librenms-check-rrdcached"
-    tag: "0.1.7"
+    tag: "0.1.8"
 
 checkMemcached:
   image:
     repository: "docker.io/tpboudreau/librenms-check-memcached"
-    tag: "0.1.7"
+    tag: "0.1.8"
 
 checkRedis:
   image:
     repository: "docker.io/tpboudreau/librenms-check-redis"
-    tag: "0.1.7"
+    tag: "0.1.8"
 
 cleanupApplication:
   image:
     repository: "docker.io/tpboudreau/librenms-cleanup-application"
-    tag: "0.1.7"
+    tag: "0.1.8"
 

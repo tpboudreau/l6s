@@ -231,6 +231,7 @@ RUN rm /etc/php/7.4/fpm/pool.d/*
 COPY php-fpm.d/docker.first.conf /etc/php/7.4/fpm/pool.d/+docker.conf
 COPY php-fpm.d/librenms.conf /etc/php/7.4/fpm/pool.d/librenms.conf
 COPY php-fpm.d/docker.last.conf /etc/php/7.4/fpm/pool.d/~docker.conf
+RUN ln -s /etc/ssl/certs/ca-certificates.crt /usr/lib/ssl/cert.pem
 
 VOLUME /opt/librenms /sock
 
